@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Don\'t worry</string>
+    <string name="hello">Hello</string>
+    <string name="help">Help</string>
+    <string name="get_hint">Get a hint for today!</string>
+    <string name="setting">Settings</string>
+    <string name="make_review">You should make the daily mood review!</string>
+    <string name="mood">What is your mood today?</string>
+</resources>
