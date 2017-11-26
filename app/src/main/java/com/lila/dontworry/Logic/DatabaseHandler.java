@@ -7,6 +7,7 @@ package com.lila.dontworry.Logic;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -43,6 +44,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
     }
 
     // Creating Tables
@@ -59,8 +61,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_HINTS_TABLE);
 
         String CREATE_RELEVANT_FOR_TABLE = "CREATE TABLE " + TABLE_RELEVANT_FOR + "("
-                + KEY_QUESTION_ID + " INTEGER PRIMARY KEY," + KEY_HINT_ID + " INTEGER PRIMARY KEY,"
-                + KEY_INVERTED + " BIT" + ")";
+                + KEY_QUESTION_ID + " INTEGER," + KEY_HINT_ID + " INTEGER,"
+                + KEY_INVERTED + " BIT," + " PRIMARY KEY (" + KEY_QUESTION_ID + ", " + KEY_HINT_ID + ")" + ")";
         db.execSQL(CREATE_RELEVANT_FOR_TABLE);
 
         String CREATE_OBJECTS_TABLE = "CREATE TABLE " + TABLE_OBJECTS + "("
@@ -69,12 +71,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_OBJECTS_TABLE);
 
         String CREATE_QUESTION_OBJECTS_TABLE = "CREATE TABLE " + TABLE_QUESTION_OBJECTS + "("
-                + KEY_QUESTION_ID + " INTEGER PRIMARY KEY," + KEY_OBJECT_ID + " INTEGER PRIMARY KEY" + ")";
+                + KEY_QUESTION_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_QUESTION_ID + ", " + KEY_OBJECT_ID + ")" + ")";
         db.execSQL(CREATE_QUESTION_OBJECTS_TABLE);
 
         String CREATE_HINT_OBJECTS_TABLE = "CREATE TABLE " + TABLE_HINT_OBJECTS + "("
-                + KEY_HINT_ID + " INTEGER PRIMARY KEY," + KEY_OBJECT_ID + " INTEGER PRIMARY KEY" + ")";
-        db.execSQL(CREATE_HINT_OBJECTS_TABLE);
+                + KEY_HINT_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + ")" + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
 
 
     }
@@ -101,8 +102,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     public Question nextQuestion() {
-        Question result = new Question("", 0);
-        return result;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        int id = 1;
+        Cursor cursor = db.query(TABLE_QUESTIONS, null, KEY_QUESTION_ID + "=?",
+                new String[] { String.valueOf(id) }, null, null, null, null);
+
+        Question question = Question.getDefault();
+        if (cursor != null) {
+            System.out.println(cursor.getCount());
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                int q_id = cursor.getInt(0);
+                String q_text = cursor.getString(1);
+                boolean q_answer = cursor.getInt(2) != 0;
+                question = new Question(q_text, q_id, q_answer);
+            }
+        }
+        db.close();
+
+        return question;
     }
 
     public Hint nextHint() {
@@ -110,12 +129,51 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return result;
     }
 
-    public void connectObject(DisplayObject displayObject, Question question) {
+
+    private boolean contains(String table, String column, String value) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(table, new String[] { column }, column + "=?",
+                new String[] { value }, null, null, null, null);
+
+        boolean result = false;
+        if (cursor != null)
+            result = (cursor.getCount() > 0);
+        db.close();
+
+        return result;
 
     }
 
-    public void connectObject(DisplayObject displayObject, Hint hint) {
 
+    public void connectObject(DisplayObject displayObject, Question question) {
+        if (contains(TABLE_QUESTION_OBJECTS, KEY_QUESTION_ID, String.valueOf(question.getId())))
+            return;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_QUESTION_ID, question.getId());
+        values.put(KEY_OBJECT_ID, displayObject.getId());
+
+        // Inserting Row
+        db.insert(TABLE_QUESTION_OBJECTS, null, values);
+        db.close(); // Closing database connection
+    }
+
+    public void connectObject(DisplayObject displayObject, Hint hint) {
+        if (contains(TABLE_HINT_OBJECTS, KEY_HINT_ID, String.valueOf(hint.getId())))
+            return;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_HINT_ID, hint.getId());
+        values.put(KEY_OBJECT_ID, displayObject.getId());
+
+        // Inserting Row
+        db.insert(TABLE_HINT_OBJECTS, null, values);
+        db.close(); // Closing database connection
     }
 
     public int answerQuestion(Question question, boolean answer) {
@@ -125,8 +183,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ANSWER, question.isAnswer());
 
         // updating row
-        return db.update(TABLE_QUESTIONS, values, KEY_QUESTION_ID + " = ?",
+        int result = db.update(TABLE_QUESTIONS, values, KEY_QUESTION_ID + " = ?",
                 new String[] { String.valueOf(question.getId()) });
+        db.close();
+        return result;
     }
 
 

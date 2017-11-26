@@ -13,7 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.lila.dontworry.Logic.DatabaseHandler;
+
 public class MainActivity extends AppCompatActivity {
+    DatabaseHandler databaseHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         TextView t=(TextView)findViewById(R.id.hello);
         t.setText(nameHello);
         addListenerOnButton();
+
+        createDatabase();
 
     }
     @Override
@@ -65,5 +70,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void createDatabase() {
+        databaseHandler = new DatabaseHandler(getApplicationContext());
+
+        System.out.println("Database created.");
+
+        System.out.println(databaseHandler.nextQuestion().toString());
+
     }
 };
