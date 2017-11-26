@@ -125,8 +125,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public Hint nextHint() {
-        Hint result = new Hint("", 0);
-        return result;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        int id = 1;
+        Cursor cursor = db.query(TABLE_HINTS, null, KEY_HINT_ID + "=?",
+                new String[] { String.valueOf(id) }, null, null, null, null);
+
+        Hint hint = Hint.getDefault();
+        if (cursor != null) {
+            System.out.println(cursor.getCount());
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                int h_id = cursor.getInt(0);
+                String h_text = cursor.getString(1);
+                hint = new Hint(h_text, h_id);
+            }
+        }
+        db.close();
+        return hint;
+
     }
 
 

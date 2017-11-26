@@ -43,4 +43,25 @@ public class Hint {
     public void setDisplayObject(DisplayObject displayObject) {
         this.displayObject = displayObject;
     }
+
+
+    @Override
+    public String toString() {
+        return "Hint " + text + " " + id;
+    }
+
+    public boolean equals(Hint hint) {
+        boolean equal = true;
+        if (hint.getText() != getText())
+            equal = false;
+        if (hint.getId() != getId())
+            equal = false;
+        //if (question.isAnswer() != isAnswer())
+        //    equal = false;
+        return equal;
+    }
+
+    public static Hint getDefault() {
+        return new Hint("Kein Tipp vorhanden.", Integer.MAX_VALUE );
+    }
 }
