@@ -20,6 +20,10 @@ public class Hint {
         this.id = id;
     }
 
+    public Hint(String text) {
+        this.text = text;
+    }
+
     public String getText() {
         return text;
     }

@@ -24,6 +24,10 @@ public class Question {
         this.displayObject = displayObject;
     }
 
+    public Question(String text) {
+        this.text = text;
+    }
+
     public String getText() {
         return text;
     }

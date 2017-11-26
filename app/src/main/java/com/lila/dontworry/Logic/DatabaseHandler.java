@@ -45,6 +45,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
+        wipeTables();
+
+        Question quest =new Question("Question 5");
+        Hint hint =  new Hint("Hint 5");
+        DisplayObject obj = new DisplayObject(ObjectType.LINK, "www.youtube.de");
+
+        long q = add(quest);
+        long h = add(hint);
+        long o = add(obj);
+
+        connectObject(obj, quest);
+        connectObject(obj, hint);
+
     }
 
     // Creating Tables
@@ -75,8 +88,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_QUESTION_OBJECTS_TABLE);
 
         String CREATE_HINT_OBJECTS_TABLE = "CREATE TABLE " + TABLE_HINT_OBJECTS + "("
-                + KEY_HINT_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + ")" + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
-
+                + KEY_HINT_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
+        db.execSQL(CREATE_HINT_OBJECTS_TABLE);
 
     }
 
@@ -100,49 +113,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * All CRUD(Create, Read, Update, Delete) Operations
      */
 
+    private void wipeTables() {
+        onUpgrade(this.getReadableDatabase(), DATABASE_VERSION, DATABASE_VERSION);
+    }
 
-    public Question nextQuestion() {
+    public List<Question> getAllQuestions() {
         SQLiteDatabase db = this.getReadableDatabase();
 
         int id = 1;
-        Cursor cursor = db.query(TABLE_QUESTIONS, null, KEY_QUESTION_ID + "=?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
+        Cursor cursor = db.query(TABLE_QUESTIONS, null, null/*KEY_QUESTION_ID + "=?"*/,
+                /*new String[] { String.valueOf(id) }*/null, null, null, null, null);
 
-        Question question = Question.getDefault();
+        List<Question> questions = new ArrayList<>();
         if (cursor != null) {
-            System.out.println(cursor.getCount());
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                int q_id = cursor.getInt(0);
-                String q_text = cursor.getString(1);
-                boolean q_answer = cursor.getInt(2) != 0;
-                question = new Question(q_text, q_id, q_answer);
+            //System.out.println(cursor.getCount() +  " Questions in Database.");
+            if (cursor.moveToFirst()) {
+                do {
+                    int q_id = cursor.getInt(0);
+                    String q_text = cursor.getString(1);
+                    boolean q_answer = cursor.getInt(2) != 0;
+                   questions.add(new Question(q_text, q_id, q_answer));
+                } while (cursor.moveToNext());
             }
         }
         db.close();
 
-        return question;
+        return questions;
+    }
+
+    public Question nextQuestion() {
+        return getQuestion(1);
     }
 
     public Hint nextHint() {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        int id = 1;
-        Cursor cursor = db.query(TABLE_HINTS, null, KEY_HINT_ID + "=?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
-
-        Hint hint = Hint.getDefault();
-        if (cursor != null) {
-            System.out.println(cursor.getCount());
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                int h_id = cursor.getInt(0);
-                String h_text = cursor.getString(1);
-                hint = new Hint(h_text, h_id);
-            }
-        }
-        db.close();
-        return hint;
+        return getHint(1);
 
     }
 
@@ -208,7 +212,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
 
-    private void add(Question question) {
+    private long add(Question question) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -216,22 +220,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ANSWER, question.isAnswer());
 
         // Inserting Row
-        db.insert(TABLE_QUESTIONS, null, values);
+        long id = db.insert(TABLE_QUESTIONS, null, values);
         db.close(); // Closing database connection
+        return  id;
     }
 
-    private void add(Hint hint) {
+    private long add(Hint hint) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(KEY_TEXT, hint.getText());
 
         // Inserting Row
-        db.insert(TABLE_HINTS, null, values);
+        long id = db.insert(TABLE_HINTS, null, values);
         db.close(); // Closing database connection
+        return id;
     }
 
-    private void add(DisplayObject displayObject) {
+    private long add(DisplayObject displayObject) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -239,10 +245,73 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_TYPE, displayObject.getObjectType().toString());
 
         // Inserting Row
-        db.insert(TABLE_OBJECTS, null, values);
+        long id = db.insert(TABLE_OBJECTS, null, values);
         db.close(); // Closing database connection
+        return id;
     }
 
+    private void delete(Question question) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_QUESTIONS, KEY_QUESTION_ID + " = ?",
+                new String[] { String.valueOf(question.getId()) });
+        db.close();
+    }
+
+    private void delete(Hint hint) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_HINTS, KEY_HINT_ID + " = ?",
+                new String[] { String.valueOf(hint.getId()) });
+        db.close();
+    }
+
+    private void delete(DisplayObject displayObject) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_OBJECTS, KEY_OBJECT_ID + " = ?",
+                new String[] { String.valueOf(displayObject.getId()) });
+        db.close();
+    }
+
+    private Question getQuestion(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_QUESTIONS, null, KEY_QUESTION_ID + " = ?",
+                new String[] { String.valueOf(id) }, null, null, null, null);
+
+        Question question = Question.getDefault();
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                int q_id = cursor.getInt(0);
+                String q_text = cursor.getString(1);
+                boolean q_answer = cursor.getInt(2) != 0;
+                question = new Question(q_text, q_id, q_answer);
+            }
+        }
+
+        db.close();
+
+        return question;
+    }
+
+    public Hint getHint(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_HINTS, null, KEY_HINT_ID + " = ?",
+                new String[] { String.valueOf(id) }, null, null, null, null);
+
+        Hint hint = Hint.getDefault();
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                int h_id = cursor.getInt(0);
+                String h_text = cursor.getString(1);
+                hint = new Hint(h_text, h_id);
+            }
+        }
+        db.close();
+        return hint;
+
+    }
 
 /*
 
