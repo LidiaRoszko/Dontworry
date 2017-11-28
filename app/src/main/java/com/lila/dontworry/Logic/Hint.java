@@ -56,7 +56,7 @@ public class Hint {
 
     public boolean equals(Hint hint) {
         boolean equal = true;
-        if (hint.getText() != getText())
+        if (hint.getText().equals(getText()))
             equal = false;
         if (hint.getId() != getId())
             equal = false;
@@ -65,7 +65,7 @@ public class Hint {
         return equal;
     }
 
-    public static Hint getDefault() {
+    static Hint getDefault() {
         return new Hint("Kein Tipp vorhanden.", Integer.MAX_VALUE );
     }
 }

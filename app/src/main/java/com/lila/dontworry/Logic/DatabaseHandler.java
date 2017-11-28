@@ -4,6 +4,7 @@ package com.lila.dontworry.Logic;
  * Created by Gustav on 25.11.2017.
  */
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class DatabaseHandler extends SQLiteOpenHelper {
+public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
     // All Static variables
     // Database Version
@@ -44,6 +45,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
 
         wipeTables();
 
@@ -120,7 +122,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<Question> getAllQuestions() {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        int id = 1;
         Cursor cursor = db.query(TABLE_QUESTIONS, null, null/*KEY_QUESTION_ID + "=?"*/,
                 /*new String[] { String.valueOf(id) }*/null, null, null, null, null);
 
@@ -135,6 +136,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                    questions.add(new Question(q_text, q_id, q_answer));
                 } while (cursor.moveToNext());
             }
+            cursor.close();
         }
         db.close();
 
@@ -158,8 +160,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { value }, null, null, null, null);
 
         boolean result = false;
-        if (cursor != null)
+        if (cursor != null) {
             result = (cursor.getCount() > 0);
+            cursor.close();
+        }
         db.close();
 
         return result;
@@ -167,7 +171,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public void connectObject(DisplayObject displayObject, Question question) {
+    private void connectObject(DisplayObject displayObject, Question question) {
         if (contains(TABLE_QUESTION_OBJECTS, KEY_QUESTION_ID, String.valueOf(question.getId())))
             return;
 
@@ -182,7 +186,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
 
-    public void connectObject(DisplayObject displayObject, Hint hint) {
+    private void connectObject(DisplayObject displayObject, Hint hint) {
         if (contains(TABLE_HINT_OBJECTS, KEY_HINT_ID, String.valueOf(hint.getId())))
             return;
 
@@ -285,6 +289,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String q_text = cursor.getString(1);
                 boolean q_answer = cursor.getInt(2) != 0;
                 question = new Question(q_text, q_id, q_answer);
+                cursor.close();
             }
         }
 
@@ -293,7 +298,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return question;
     }
 
-    public Hint getHint(int id) {
+    private Hint getHint(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_HINTS, null, KEY_HINT_ID + " = ?",
@@ -306,6 +311,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 int h_id = cursor.getInt(0);
                 String h_text = cursor.getString(1);
                 hint = new Hint(h_text, h_id);
+                cursor.close();
             }
         }
         db.close();

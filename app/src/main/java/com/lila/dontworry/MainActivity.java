@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View arg0) {
                 // Intent is what you use to start another activity
                 Intent intent = new Intent(context, QuestionActivity.class);
+                intent.putExtra("DatabaseHandler", databaseHandler);
                 startActivity(intent);
 
             }

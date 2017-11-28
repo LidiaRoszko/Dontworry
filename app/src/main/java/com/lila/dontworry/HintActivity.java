@@ -11,11 +11,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lila.dontworry.Logic.DatabaseHandler;
+
 public class HintActivity extends AppCompatActivity {
+    private DatabaseHandler databaseHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        databaseHandler = new DatabaseHandler(getApplicationContext());
+
         setContentView(R.layout.activity_hint);
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -28,7 +34,8 @@ public class HintActivity extends AppCompatActivity {
             }
         });
         TextView t=(TextView)findViewById(R.id.hint);
-        t.setText("Go for a walk");
+        t.setText(databaseHandler.nextHint().getText());
+//        t.setText("Go for a walk");
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

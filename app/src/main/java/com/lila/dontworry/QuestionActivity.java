@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.hints.ExtraHint;
 import com.lila.dontworry.hints.Hint;
 
@@ -18,10 +19,14 @@ public class QuestionActivity extends AppCompatActivity {
     private String place,name;
 
     private ArrayList<Hint> dataBaseOfHints = new ArrayList<Hint>();
+    private DatabaseHandler databaseHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        databaseHandler = new DatabaseHandler(getApplicationContext());
+
         setContentView(R.layout.activity_question);
         //Toolbar
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
@@ -42,7 +47,8 @@ public class QuestionActivity extends AppCompatActivity {
 
         //Question2
         TextView t = findViewById(R.id.question2);
-        t.setText(" how was in " + e.getName());
+        t.setText(databaseHandler.nextQuestion().getText());
+        //t.setText(" how was in " + e.getName());
 
 
         addListenerOnButton(hints);
