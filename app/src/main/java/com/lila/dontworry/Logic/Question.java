@@ -60,6 +60,30 @@ public class Question {
         this.displayObject = displayObject;
     }
 
+    public String createText() {
+        String createdText = "";
+
+        String objectContent = (displayObject == null) ? "" : displayObject.getContent();
+        createdText = String.format(getText(), objectContent);
+        /*
+        switch (getType()) {
+            case LINK:
+                createdText = getText();
+                break;
+            case PLACE:
+                createdText = String.format(getText(), displayObject.getContent());
+                break;
+            case CONTACT:
+                createdText = String.format(getText(), displayObject.getContent());
+                break;
+            default:
+                createdText = getText();
+                break;
+        }
+        */
+        return createdText;
+    }
+
     @Override
     public String toString() {
         return "Question " + text + " " + id + " " + answer;
@@ -78,5 +102,11 @@ public class Question {
 
     public static Question getDefault() {
         return new Question("Keine Frage vorhanden.", Integer.MAX_VALUE, false );
+    }
+
+    private ObjectType getType() {
+        if (displayObject == null)
+            return ObjectType.EMPTY;
+        return displayObject.getObjectType();
     }
 }

@@ -78,8 +78,6 @@ public class MainActivity extends AppCompatActivity {
 
         System.out.println("Database created.");
 
-        System.out.println(databaseHandler.getAllQuestions());
-
         System.out.println(databaseHandler.nextQuestion());
         System.out.println(databaseHandler.nextHint());
 

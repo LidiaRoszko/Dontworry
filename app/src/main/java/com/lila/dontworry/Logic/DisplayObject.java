@@ -14,6 +14,12 @@ public class DisplayObject {
         this.content = content;
     }
 
+    public DisplayObject(int id, ObjectType objectType, String content) {
+        this.id = id;
+        this.objectType = objectType;
+        this.content = content;
+    }
+
     public ObjectType getObjectType() {
         return objectType;
     }
@@ -34,7 +40,18 @@ public class DisplayObject {
         return id;
     }
 
+    public static DisplayObject getDefault() {
+        return new DisplayObject(ObjectType.EMPTY, "Nothingness");
+
+    }
+
     public void setId(int id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "DisplayObject[" + id + "] " + objectType + " " + content;
+    }
+
 }

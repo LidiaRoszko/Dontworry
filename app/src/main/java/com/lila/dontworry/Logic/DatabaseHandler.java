@@ -49,13 +49,17 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         wipeTables();
 
-        Question quest =new Question("Question 5");
-        Hint hint =  new Hint("Hint 5");
-        DisplayObject obj = new DisplayObject(ObjectType.LINK, "www.youtube.de");
+        Question quest =new Question("Did you like to call %s?");
+        Hint hint =  new Hint("Call %s.");
+        DisplayObject obj = new DisplayObject(ObjectType.CONTACT, "Bodirsky");
 
-        long q = add(quest);
-        long h = add(hint);
-        long o = add(obj);
+        long qID = add(quest);
+        long hID = add(hint);
+        long oID = add(obj);
+
+        quest = getQuestion((int)qID);
+        hint  = getHint((int)hID);
+        obj = getObject((int)oID);
 
         connectObject(obj, quest);
         connectObject(obj, hint);
@@ -119,29 +123,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         onUpgrade(this.getReadableDatabase(), DATABASE_VERSION, DATABASE_VERSION);
     }
 
-    public List<Question> getAllQuestions() {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_QUESTIONS, null, null/*KEY_QUESTION_ID + "=?"*/,
-                /*new String[] { String.valueOf(id) }*/null, null, null, null, null);
-
-        List<Question> questions = new ArrayList<>();
-        if (cursor != null) {
-            //System.out.println(cursor.getCount() +  " Questions in Database.");
-            if (cursor.moveToFirst()) {
-                do {
-                    int q_id = cursor.getInt(0);
-                    String q_text = cursor.getString(1);
-                    boolean q_answer = cursor.getInt(2) != 0;
-                   questions.add(new Question(q_text, q_id, q_answer));
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-        db.close();
-
-        return questions;
-    }
 
     public Question nextQuestion() {
         return getQuestion(1);
@@ -254,6 +235,13 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         return id;
     }
 
+    public long addConnected(DisplayObject displayObject, int questionId, int hintId) {
+        int objId = (int)add(displayObject);
+        connectObject(getObject(objId), getQuestion(questionId));
+        connectObject(getObject(objId), getHint(hintId));
+        return objId;
+    }
+
     private void delete(Question question) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_QUESTIONS, KEY_QUESTION_ID + " = ?",
@@ -275,21 +263,77 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.close();
     }
 
-    private Question getQuestion(int id) {
+    private DisplayObject getObject(int objectId) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_QUESTIONS, null, KEY_QUESTION_ID + " = ?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
+        Cursor cursorObject = db.query(TABLE_OBJECTS, null, KEY_OBJECT_ID + " = ?",
+                new String[] { String.valueOf(objectId) }, null, null, null, null);
+
+        DisplayObject displayObject = DisplayObject.getDefault();
+
+        if (cursorObject != null) {
+            if (cursorObject.getCount() > 0) {
+                cursorObject.moveToFirst();
+                int o_id = cursorObject.getInt(0);
+                String o_text = cursorObject.getString(1);
+                ObjectType o_type = ObjectType.valueOf(cursorObject.getString(2));
+                displayObject = new DisplayObject(o_id, o_type, o_text);
+                cursorObject.close();
+            }
+        }
+        db.close();
+        return displayObject;
+
+    }
+
+    private DisplayObject getObject(int connectedId, String TABLE) {
+        DisplayObject displayObject = DisplayObject.getDefault();
+        String KEY;
+
+
+        if (TABLE.equals(TABLE_QUESTION_OBJECTS))
+            KEY = KEY_QUESTION_ID;
+        else if( TABLE.equals(TABLE_HINT_OBJECTS))
+            KEY = KEY_HINT_ID;
+        else
+            return displayObject;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        final String OBJECT_QUERY = "SELECT * FROM " + TABLE +
+                " a INNER JOIN " + TABLE_OBJECTS + " b ON a." + KEY_OBJECT_ID + "=b." + KEY_OBJECT_ID + " WHERE a." + KEY + "=?";
+        Cursor cursorObject = db.rawQuery(OBJECT_QUERY, new String[]{String.valueOf(connectedId)});
+
+        if (cursorObject != null) {
+            if (cursorObject.getCount() > 0) {
+                cursorObject.moveToFirst();
+                int o_id = cursorObject.getInt(0);
+                displayObject = getObject(o_id);
+                cursorObject.close();
+            }
+        }
+        db.close();
+        return displayObject;
+    }
+
+    private Question getQuestion(int questionId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursorQuest = db.query(TABLE_QUESTIONS, null, KEY_QUESTION_ID + " = ?",
+                new String[] { String.valueOf(questionId) }, null, null, null, null);
+
+
 
         Question question = Question.getDefault();
-        if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                int q_id = cursor.getInt(0);
-                String q_text = cursor.getString(1);
-                boolean q_answer = cursor.getInt(2) != 0;
-                question = new Question(q_text, q_id, q_answer);
-                cursor.close();
+        if (cursorQuest != null) {
+            if (cursorQuest.getCount() > 0) {
+                cursorQuest.moveToFirst();
+                int q_id = cursorQuest.getInt(0);
+                String q_text = cursorQuest.getString(1);
+                boolean q_answer = cursorQuest.getInt(2) != 0;
+                DisplayObject q_obj = getObject(questionId, TABLE_QUESTION_OBJECTS);
+                question = new Question(q_text, q_id, q_answer, q_obj);
+                cursorQuest.close();
             }
         }
 
@@ -298,11 +342,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         return question;
     }
 
-    private Hint getHint(int id) {
+    private Hint getHint(int hintId) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_HINTS, null, KEY_HINT_ID + " = ?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
+                new String[] { String.valueOf(hintId) }, null, null, null, null);
 
         Hint hint = Hint.getDefault();
         if (cursor != null) {
@@ -310,7 +354,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 cursor.moveToFirst();
                 int h_id = cursor.getInt(0);
                 String h_text = cursor.getString(1);
-                hint = new Hint(h_text, h_id);
+                DisplayObject h_obj = getObject(hintId, TABLE_HINT_OBJECTS);
+                //System.out.println(h_obj);
+                hint = new Hint(h_text, h_id, h_obj);
                 cursor.close();
             }
         }

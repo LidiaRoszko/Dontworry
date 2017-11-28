@@ -34,7 +34,7 @@ public class HintActivity extends AppCompatActivity {
             }
         });
         TextView t=(TextView)findViewById(R.id.hint);
-        t.setText(databaseHandler.nextHint().getText());
+        t.setText(databaseHandler.nextHint().createText());
 //        t.setText("Go for a walk");
     }
     @Override

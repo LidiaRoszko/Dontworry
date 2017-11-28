@@ -47,7 +47,7 @@ public class QuestionActivity extends AppCompatActivity {
 
         //Question2
         TextView t = findViewById(R.id.question2);
-        t.setText(databaseHandler.nextQuestion().getText());
+        t.setText(databaseHandler.nextQuestion().createText());
         //t.setText(" how was in " + e.getName());
 
 

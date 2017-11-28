@@ -5,6 +5,7 @@ package com.lila.dontworry.Logic;
  */
 
 public enum ObjectType {
+    EMPTY,
     LINK,
     PLACE,
     CONTACT
