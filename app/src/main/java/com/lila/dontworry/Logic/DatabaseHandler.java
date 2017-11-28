@@ -7,6 +7,7 @@ package com.lila.dontworry.Logic;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -49,20 +50,40 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         wipeTables();
 
-        Question quest =new Question("Did you like to call %s?");
+        Question quest =new Question("Did you enjoy your call with %s?");
+        Question quest2 =new Question("Did you enjoy to visit %s?");
+        Question quest3 =new Question("Do you like to eat candy?");
         Hint hint =  new Hint("Call %s.");
+        Hint hint2 =  new Hint("Visit %s.");
+        Hint hint3 =  new Hint("Eat some candy.");
         DisplayObject obj = new DisplayObject(ObjectType.CONTACT, "Bodirsky");
+        DisplayObject obj2 = new DisplayObject(ObjectType.PLACE, "APB");
 
         long qID = add(quest);
+        long qID2 = add(quest2);
+        long qID3 = add(quest3);
         long hID = add(hint);
+        long hID2 = add(hint2);
+        long hID3 = add(hint3);
         long oID = add(obj);
+        long oID2 = add(obj2);
 
         quest = getQuestion((int)qID);
         hint  = getHint((int)hID);
         obj = getObject((int)oID);
 
-        connectObject(obj, quest);
-        connectObject(obj, hint);
+        quest2 = getQuestion((int)qID2);
+        hint2  = getHint((int)hID2);
+        obj2 = getObject((int)oID2);
+
+        quest3 = getQuestion((int)qID3);
+        hint3  = getHint((int)hID3);
+
+
+
+        addConnected(obj, (int)qID, (int)hID);
+        addConnected(obj2, (int)qID2, (int)hID2);
+
 
     }
 
@@ -125,11 +146,13 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
 
     public Question nextQuestion() {
-        return getQuestion(1);
+        int randomQuestionId = ThreadLocalRandom.current().nextInt(1, countRows(TABLE_QUESTIONS) + 1);
+        return getQuestion(randomQuestionId);
     }
 
     public Hint nextHint() {
-        return getHint(1);
+        int randomQuestionId = ThreadLocalRandom.current().nextInt(1, countRows(TABLE_HINTS) + 1);
+        return getHint(randomQuestionId);
 
     }
 
@@ -143,6 +166,24 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         boolean result = false;
         if (cursor != null) {
             result = (cursor.getCount() > 0);
+            cursor.close();
+        }
+        db.close();
+
+        return result;
+
+    }
+
+
+    private int countRows(String table) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(table, null, null,
+                null, null, null, null, null);
+
+        int result = 0;
+        if (cursor != null) {
+            result = cursor.getCount();
             cursor.close();
         }
         db.close();
