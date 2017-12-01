@@ -12,7 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimary"
-        tools:context=".MainActivity">
+        tools:context=".MainActivity"
+        tools:layout_editor_absoluteX="125dp"
+        tools:layout_editor_absoluteY="129dp">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/my_toolbar"
@@ -25,13 +27,13 @@
             app:popupTheme="@style/AppTheme">
 
             <TextView
+                android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Don't worry"
                 android:layout_gravity="center"
-                android:textSize="30dp"
-                android:id="@+id/toolbar_title" />
-            </android.support.v7.widget.Toolbar>
+                android:text="Don't worry"
+                android:textSize="30dp" />
+        </android.support.v7.widget.Toolbar>
 
         <LinearLayout
             android:id="@+id/upLayout"
@@ -40,7 +42,6 @@
             android:layout_above="@+id/secondView"
             android:layout_marginTop="?attr/actionBarSize"
             android:background="@color/colorAccent"
-            android:labelFor="@id/questionsmark"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -95,13 +96,21 @@
                 android:layout_width="wrap_content"
 
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical|center_horizontal"
                 android:orientation="vertical"
                 android:scaleType="fitCenter">
+
+                <ImageButton
+                    android:id="@+id/next"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/darkgreen"
+                    app:srcCompat="@android:drawable/ic_media_ff" />
+
                 <TextView
-                    android:id="@+id/hello"
+                    android:id="@+id/question"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
@@ -110,28 +119,29 @@
                     android:textAlignment="center"
                     android:textSize="24sp"
                     android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/makereview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:labelFor="@+id/bulb"
-                    android:scaleType="fitCenter"
-                    android:text="@string/make_review"
-                    android:textAlignment="center"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
 
-                <ImageButton
-                    android:id="@+id/questionsmark"
-                    android:layout_width="match_parent"
+                <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/radio_group"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/colorPrimary"
-                    android:scaleType="fitCenter"
-                    android:textAlignment="center"
-                    app:srcCompat="@mipmap/dontworryfragenzeichen" />
+                    android:orientation="vertical">
 
+                    <RadioButton
+
+                        android:id="@+id/yes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Yes" />
+
+                    <RadioButton
+
+                        android:id="@+id/no"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="No" />
+                </RadioGroup>
             </LinearLayout>
 
         </LinearLayout>

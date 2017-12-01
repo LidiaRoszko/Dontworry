@@ -5,5 +5,10 @@
     <string name="get_hint">Get a hint for today!</string>
     <string name="setting">Settings</string>
     <string name="make_review">You should make the daily mood review!</string>
+    <string name="call">You should call someone!</string>
     <string name="mood">What is your mood today?</string>
+    <string name="title_activity_phone">PhoneActivity</string>
+    <string name="walk">Go for a walk!</string>
+    <string name="sunny">It is sunny outside!</string>
+    <string name="nice">It is nice outside!</string>
 </resources>
