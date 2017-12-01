@@ -101,47 +101,41 @@
                 android:orientation="vertical"
                 android:scaleType="fitCenter">
 
-                <ImageButton
-                    android:id="@+id/next"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@color/darkgreen"
-                    app:srcCompat="@android:drawable/ic_media_ff" />
-
                 <TextView
                     android:id="@+id/question"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
+                    android:layout_weight="1"
                     android:scaleType="fitCenter"
                     android:text="@string/hello"
                     android:textAlignment="center"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
-                <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/radio_group"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
 
-                    <RadioButton
-
-                        android:id="@+id/yes"
+                    <ImageButton
+                        android:id="@+id/falseButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Yes" />
+                        android:background="@color/colorPrimary"
+                        app:srcCompat="@mipmap/no" />
 
-                    <RadioButton
-
-                        android:id="@+id/no"
+                    <ImageButton
+                        android:id="@+id/trueButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="No" />
-                </RadioGroup>
+                        android:background="@color/colorPrimary"
+                        app:srcCompat="@mipmap/yes" />
+                </LinearLayout>
+
             </LinearLayout>
 
         </LinearLayout>

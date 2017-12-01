@@ -94,7 +94,7 @@ public class Hint {
         return displayObject.getObjectType();
     }
 
-    static Hint getDefault() {
+    public static Hint getDefault() {
         return new Hint("Kein Tipp vorhanden.", Integer.MAX_VALUE );
     }
 }

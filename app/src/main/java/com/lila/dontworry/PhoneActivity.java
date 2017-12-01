@@ -18,12 +18,16 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.lila.dontworry.Logic.DatabaseHandler;
+import com.lila.dontworry.Logic.DisplayObject;
+import com.lila.dontworry.Logic.ObjectType;
 
 public class PhoneActivity extends AppCompatActivity {
-
+DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone);
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
@@ -38,10 +42,11 @@ public class PhoneActivity extends AppCompatActivity {
         });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.call);
 
-
+        //permissions to check
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             System.out.println("check1");
         }
+
         Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, "date DESC");
                 int number = cursor.getColumnIndex(CallLog.Calls.NUMBER);
                 int duration = cursor.getColumnIndex(CallLog.Calls.DURATION);
@@ -69,6 +74,9 @@ public class PhoneActivity extends AppCompatActivity {
                 final String number_to_call2 = number_to_call;
                 final String photo_of_person2 = photo_of_person;
 
+                DisplayObject displayObject = new DisplayObject(ObjectType.CONTACT, person_to_call);
+                databaseHandler.addConnected(displayObject, 1, 1);
+
                 if(person_to_call2!=""){
                     TextView t=(TextView)findViewById(R.id.callText);
                     t.setText("You should call "+person_to_call2+"!");
@@ -83,17 +91,17 @@ public class PhoneActivity extends AppCompatActivity {
                 if (ActivityCompat.checkSelfPermission(self, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
                     System.out.println("check2");
                 }
+                //phoning someone
                 if(flag2==1){System.out.println("flag21" + flag2);
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
                     callIntent.setData(Uri.parse("tel:"+number_to_call2));
                     startActivity(callIntent);
                 }
+                //redirect to phone book
                 else{System.out.println("flag22" + flag2);
                     Intent intent= new Intent(Intent.ACTION_PICK,  ContactsContract.Contacts.CONTENT_URI);
                     startActivityForResult(intent, 1);
-
                 }
-
             }
         });
     }

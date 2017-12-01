@@ -1,29 +1,16 @@
 package com.lila.dontworry;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 
-import com.lila.dontworry.Logic.JSONParser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
-
 public class WeatherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //initialisation of activity and toolbar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
@@ -36,7 +23,7 @@ public class WeatherActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-
+/*
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
             System.out.println("check");
         }
@@ -63,11 +50,11 @@ public class WeatherActivity extends AppCompatActivity {
                 }System.out.println("rrr"+MyResult);
             }
         });
-System.out.println("rrr");
+    System.out.println("rrr");*/
     }
 
 
-
+    //create menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -75,4 +62,3 @@ System.out.println("rrr");
         return true;
     }
 }
-

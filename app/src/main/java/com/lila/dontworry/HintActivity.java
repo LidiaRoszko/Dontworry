@@ -1,27 +1,26 @@
 package com.lila.dontworry;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.lila.dontworry.Logic.DatabaseHandler;
+import com.lila.dontworry.Logic.Hint;
 
 public class HintActivity extends AppCompatActivity {
-    private DatabaseHandler databaseHandler;
+
+    DatabaseHandler databaseHandler;
+    Hint act_hint = Hint.getDefault();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        databaseHandler = new DatabaseHandler(this);
+
+        //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);
-
-        databaseHandler = new DatabaseHandler(getApplicationContext());
-
         setContentView(R.layout.activity_hint);
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -33,14 +32,21 @@ public class HintActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-        TextView t=(TextView)findViewById(R.id.hint);
-        t.setText(databaseHandler.nextHint().createText());
-//        t.setText("Go for a walk");
+
+        //get hint with object of type EMPTY, PLACE*when there is no google maps integration to gos there
+        act_hint = databaseHandler.nextHint();
+        TextView hint = findViewById(R.id.hint);
+        hint.setText(act_hint.createText());
     }
+
+    //initialisation of menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
-}
+
+
+
+    }
