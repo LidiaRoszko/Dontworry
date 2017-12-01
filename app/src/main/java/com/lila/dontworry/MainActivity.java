@@ -15,7 +15,10 @@ import android.widget.TextView;
 import java.util.Random;
 
 
+import com.lila.dontworry.Logic.DatabaseHandler;
+
 public class MainActivity extends AppCompatActivity {
+    DatabaseHandler databaseHandler;
 
     //DatabaseHandler databaseHandler = new DatabaseHandler(this);
     //Question act_question = databaseHandler.nextQuestion();
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         radioGroup.clearCheck();
 
+        createDatabase();
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -50,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View arg0) {
+<<<<<<< HEAD
                 Random randomGenerator = new Random();
                 if(randomGenerator.nextInt(2)==1) {
                     Intent intent = new Intent(context, PhoneActivity.class);
@@ -59,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent2 = new Intent(context, WeatherActivity.class);
                     startActivity(intent2);
                 }
+=======
+                // Intent is what you use to start another activity
+                Intent intent = new Intent(context, QuestionActivity.class);
+                intent.putExtra("DatabaseHandler", databaseHandler);
+                startActivity(intent);
+
+>>>>>>> 57560a0d19a2dc1b46d80f0107ab88a3c796f837
             }
         });
 
@@ -78,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+<<<<<<< HEAD
     public void onRadioButtonClicked(View view) {
         RadioButton yes = (RadioButton) findViewById(R.id.yes);
         RadioButton no = (RadioButton) findViewById(R.id.no);
@@ -90,5 +104,15 @@ public class MainActivity extends AppCompatActivity {
             //databaseHandler.answerQuestion(act_question,true);
             System.out.println("answer:true");
         }
+=======
+    private void createDatabase() {
+        databaseHandler = new DatabaseHandler(getApplicationContext());
+
+        System.out.println("Database created.");
+
+        System.out.println(databaseHandler.nextQuestion());
+        System.out.println(databaseHandler.nextHint());
+
+>>>>>>> 57560a0d19a2dc1b46d80f0107ab88a3c796f837
     }
 };

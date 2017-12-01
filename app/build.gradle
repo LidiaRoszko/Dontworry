@@ -5,7 +5,11 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.lila.dontworry"
+<<<<<<< HEAD
         minSdkVersion 22
+=======
+        minSdkVersion 21
+>>>>>>> 57560a0d19a2dc1b46d80f0107ab88a3c796f837
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
