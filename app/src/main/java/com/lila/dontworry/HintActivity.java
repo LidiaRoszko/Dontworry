@@ -1,9 +1,9 @@
 package com.lila.dontworry;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.TextView;
 import com.lila.dontworry.Logic.DatabaseHandler;
@@ -13,10 +13,10 @@ public class HintActivity extends AppCompatActivity {
 
     DatabaseHandler databaseHandler;
     Hint act_hint = Hint.getDefault();
+    private Context self = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         databaseHandler = new DatabaseHandler(this);
 
         //initialisation of Activity and Toolbar
@@ -29,7 +29,8 @@ public class HintActivity extends AppCompatActivity {
         myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                Intent intent = new Intent(self, MainActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -39,14 +40,4 @@ public class HintActivity extends AppCompatActivity {
         hint.setText(act_hint.createText());
     }
 
-    //initialisation of menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-
-
-    }
+}

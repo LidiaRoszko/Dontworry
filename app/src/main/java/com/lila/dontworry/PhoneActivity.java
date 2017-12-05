@@ -13,8 +13,6 @@ import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,10 +21,10 @@ import com.lila.dontworry.Logic.DisplayObject;
 import com.lila.dontworry.Logic.ObjectType;
 
 public class PhoneActivity extends AppCompatActivity {
-DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
+
+    private Context self = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone);
@@ -37,7 +35,8 @@ DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
         myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                Intent intent = new Intent(self, MainActivity.class);
+                startActivity(intent);
             }
         });
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.call);
@@ -74,8 +73,7 @@ DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
                 final String number_to_call2 = number_to_call;
                 final String photo_of_person2 = photo_of_person;
 
-                DisplayObject displayObject = new DisplayObject(ObjectType.CONTACT, person_to_call);
-                databaseHandler.addConnected(displayObject, 1, 1);
+
 
                 if(person_to_call2!=""){
                     TextView t=(TextView)findViewById(R.id.callText);
@@ -83,6 +81,10 @@ DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
                     Uri photoUri = ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, Long.parseLong(photo_of_person2));
                     ImageView imageView=(ImageView)findViewById(R.id.contactPhoto);
                     imageView.setImageURI(photoUri);
+                    DisplayObject displayObject = new DisplayObject(ObjectType.CONTACT, person_to_call);
+                    DatabaseHandler databaseHandler = new DatabaseHandler(this);
+                    databaseHandler.addConnected(displayObject, 0 , 0);
+                    System.out.println("new add to DB in PhoneActivity");
                 }
 
                 fab.setOnClickListener(new View.OnClickListener() {
@@ -104,12 +106,5 @@ DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
                 }
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
     }
 }

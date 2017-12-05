@@ -37,7 +37,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/walk"
+                android:id="@+id/title_weather"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|center"
@@ -51,8 +51,8 @@
 
             <ImageView
                 android:id="@+id/weather_icon"
-                android:layout_width="match_parent"
-                android:layout_height="195dp"
+                android:layout_width="195dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="0dp"
                 android:layout_weight="1"
@@ -60,7 +60,7 @@
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
-                android:id="@+id/walk2"
+                android:id="@+id/city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
@@ -72,7 +72,73 @@
                 android:textAlignment="center"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/details_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:scaleType="fitCenter"
+                android:text="@string/nice"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/current_temperature_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:scaleType="fitCenter"
+                android:text="@string/nice"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/humidity_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:scaleType="fitCenter"
+                android:text="@string/nice"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/pressure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:scaleType="fitCenter"
+                android:text="@string/nice"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
+<!--
+        cityField = (TextView)findViewById(R.id.city_field);
+        updatedField = (TextView)findViewById(R.id.updated_field);
+        detailsField = (TextView)findViewById(R.id.);
+        currentTemperatureField = (TextView)findViewById(R.id.);
+        humidity_field = (TextView)findViewById(R.id.);
+        pressure_field = (TextView)findViewById(R.id.);
+        weatherIcon = (TextView)findViewById(R.id.weather_icon2);
+        weatherIcon.setTypeface(weatherFont);-->
 
     </LinearLayout>
 

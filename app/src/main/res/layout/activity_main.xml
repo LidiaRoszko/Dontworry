@@ -36,78 +36,58 @@
         </android.support.v7.widget.Toolbar>
 
         <LinearLayout
-            android:id="@+id/upLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/secondView"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:background="@color/colorAccent"
-            android:orientation="horizontal">
+            android:layout_marginTop="44dp"
+            android:background="@color/common_google_signin_btn_text_dark_default"
+            android:orientation="vertical"
+            android:paddingTop="20dp">
 
             <LinearLayout
-                android:id="@+id/upper"
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:scaleType="fitCenter">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/gethint"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:labelFor="@+id/bulb"
-                    android:scaleType="fitCenter"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
                     android:text="@string/get_hint"
                     android:textAlignment="center"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
-                <ImageButton
-                    android:id="@+id/bulb"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="30dp"
+                    android:orientation="horizontal">
 
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/colorAccent"
-                    android:scaleType="centerInside"
-                    android:textAlignment="center"
-                    app:srcCompat="@mipmap/dontworryinside" />
+                    <ImageButton
+                        android:id="@+id/bulb"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/common_google_signin_btn_text_dark_default"
+                        app:srcCompat="@mipmap/dontworrysmall" />
 
-            </LinearLayout>
+                </LinearLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/downLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/secondView"
-            android:background="@color/colorPrimary"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:id="@+id/below"
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_vertical|center_horizontal"
-                android:orientation="vertical"
-                android:scaleType="fitCenter">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_centerInParent="false"
+                    android:layout_centerVertical="false"
+                    android:background="@color/colorPrimary" />
 
                 <TextView
                     android:id="@+id/question"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="1"
-                    android:scaleType="fitCenter"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
                     android:text="@string/hello"
                     android:textAlignment="center"
                     android:textSize="24sp"
@@ -115,8 +95,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <ImageButton
@@ -124,7 +103,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@color/colorPrimary"
+                        android:background="@color/common_google_signin_btn_text_dark_default"
                         app:srcCompat="@mipmap/no" />
 
                     <ImageButton
@@ -132,20 +111,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@color/colorPrimary"
+                        android:background="@color/common_google_signin_btn_text_dark_default"
                         app:srcCompat="@mipmap/yes" />
                 </LinearLayout>
-
             </LinearLayout>
 
         </LinearLayout>
 
-        <View
-            android:id="@+id/secondView"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="false" />
-
     </RelativeLayout>
+
 </android.support.constraint.ConstraintLayout>

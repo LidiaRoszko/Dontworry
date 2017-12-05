@@ -1,12 +1,17 @@
 package com.lila.dontworry;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import com.lila.dontworry.Logic.Weather;
 
 public class WeatherActivity extends AppCompatActivity {
+
+    private Context self = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -20,45 +25,38 @@ public class WeatherActivity extends AppCompatActivity {
         myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                Intent intent = new Intent(self, MainActivity.class);
+                startActivity(intent);
             }
         });
-/*
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            System.out.println("check");
+
+        final TextView cityField, detailsField, currentTemperatureField, humidity_field, pressure_field, title;
+        detailsField = findViewById(R.id.details_field);
+        currentTemperatureField = findViewById(R.id.current_temperature_field);
+        humidity_field = findViewById(R.id.humidity_field);
+        cityField = findViewById(R.id.city);
+        pressure_field = findViewById(R.id.pressure);
+        title = findViewById(R.id.title_weather);
+        final ImageView icon = findViewById(R.id.weather_icon);
+
+        detailsField.setText(Weather.getWeather_description());
+        currentTemperatureField.setText(Weather.getWeather_temperature());
+        humidity_field.setText(Weather.getWeather_humidity());
+        cityField.setText(Weather.getWeather_city());
+        pressure_field.setText(Weather.getWeather_pressure());
+
+        if(Weather.getIsSnow()){
+            title.setText("Do you want to build a snowman?");
+            icon.setImageResource(R.mipmap.snow);
         }
-        //URL to get JSON Array
-        String url = "https://query.yahooapis.com/v1/public/yql?q=select%20item%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22dresden%2C%20de%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
+
+        if(Weather.getIsSunny()){
+            title.setText("Go for a walk!");
+            icon.setImageResource(R.mipmap.sun);
+        }
 
 
-        final OkHttpClient client = new OkHttpClient();
-
-        final okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(url)
-                .build();
-
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {String MyResult = "nno";
-                try {
-                    Response response = client.newCall(request).execute();
-                     MyResult = response.body().string();
-                    System.out.println("postJSONRequest response.body : "+MyResult);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }System.out.println("rrr"+MyResult);
-            }
-        });
-    System.out.println("rrr");*/
-    }
 
 
-    //create menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
     }
 }

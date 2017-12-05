@@ -11,4 +11,6 @@
     <string name="walk">Go for a walk!</string>
     <string name="sunny">It is sunny outside!</string>
     <string name="nice">It is nice outside!</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="setLocation">Set Location</string>
 </resources>
