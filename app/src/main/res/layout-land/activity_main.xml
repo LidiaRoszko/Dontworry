@@ -41,52 +41,33 @@
             android:layout_height="match_parent"
             android:layout_marginTop="44dp"
             android:background="@color/common_google_signin_btn_text_dark_default"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:paddingTop="20dp">
 
-            <LinearLayout
+            <ImageButton
+                android:id="@+id/bulb"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/common_google_signin_btn_text_dark_default"
+                app:srcCompat="@mipmap/dontworrysmallland" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="30dp"
-                    android:orientation="horizontal">
+                <com.lorentzos.flingswipe.SwipeFlingAdapterView
+                    android:id="@+id/frame"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/common_google_signin_btn_text_dark_default"
+                    app:rotation_degrees="15.5"
+                    tools:context=".MainActivity" >
 
-                    <ImageButton
-                        android:id="@+id/bulb"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@color/common_google_signin_btn_text_dark_default"
-                        app:srcCompat="@mipmap/dontworrysmall" />
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="6dp"
-                    android:layout_centerInParent="false"
-                    android:layout_centerVertical="false"
-                    android:background="@color/colorPrimary" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <com.lorentzos.flingswipe.SwipeFlingAdapterView
-                        android:id="@+id/frame"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@color/colorPrimary"
-                        app:rotation_degrees="15.5"
-                        tools:context=".MainActivity" />
-
-
-                </LinearLayout>
+                </com.lorentzos.flingswipe.SwipeFlingAdapterView>
             </LinearLayout>
 
         </LinearLayout>

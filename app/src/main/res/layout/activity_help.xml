@@ -6,4 +6,23 @@
     android:layout_height="match_parent"
     tools:context="com.lila.dontworry.HelpActivity">
 
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_weight="1"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/abc"
+        app:popupTheme="@style/AppTheme">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Don't worry"
+            android:textSize="30dp" />
+    </android.support.v7.widget.Toolbar>
 </android.support.constraint.ConstraintLayout>

@@ -1,26 +1,37 @@
 package com.lila.dontworry;
+//https://github.com/Diolor/Swipecards
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 import java.util.Random;
 import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Function;
 import com.lila.dontworry.Logic.Localisation;
 import com.lila.dontworry.Logic.Question;
 import com.lila.dontworry.Logic.Weather;
+import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
 public class MainActivity extends AppCompatActivity {
 
+    private int n; //number of hints
     DatabaseHandler databaseHandler;
-    Question act_question;
+    private int count = 0;
+    private Question act_question;
+    private ArrayList<String> al;
+    private ArrayList<Question> a2;
+    private ArrayAdapter<String> arrayAdapter;
 
     //getting with rest the weather
     private void getWeather(){
@@ -39,17 +50,72 @@ public class MainActivity extends AppCompatActivity {
         //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);
         databaseHandler = new DatabaseHandler(getApplicationContext());
+        n = databaseHandler.getNumberOfQuestions();
         setContentView(R.layout.activity_main);
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         addListenerOnButton();
 
-        //set question to answer
+        //QUESTIONSs
         act_question = databaseHandler.nextQuestion();
-        TextView question = (TextView) findViewById(R.id.question);
-        question.setText(act_question.createText());
+        al = new ArrayList<>(); //array of questions' strings
+        a2 = new ArrayList<>(); //array of questions
+        Log.d("vor n", String.valueOf(n));
+        for(int i = 0; n > i ; i++){
+            Log.d("i ", String.valueOf(i));
+            al.add(act_question.createText());
+            Log.d("question ",act_question.createText());
+            a2.add(act_question);
+            act_question = databaseHandler.nextQuestion();
+        }
 
+        arrayAdapter = new ArrayAdapter(this, R.layout.item, R.id.helloText, al );
+        final SwipeFlingAdapterView flingContainer = findViewById(R.id.frame);
+        flingContainer.setAdapter(arrayAdapter);
+        flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
+
+            @Override
+            public void removeFirstObjectInAdapter() {
+                // this is the simplest way to delete an object from the Adapter (/AdapterView)
+                Log.d("LIST", "removed object!");
+                al.remove(0);
+                arrayAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onLeftCardExit(Object dataObject) {
+                databaseHandler.answerQuestion(a2.get(count),false);
+                System.out.println("answer:false");
+                count++;
+                makeToast(MainActivity.this, "No!");
+            }
+
+            @Override
+            public void onRightCardExit(Object dataObject) {
+                databaseHandler.answerQuestion(a2.get(count),true);
+                System.out.println("answer:true");
+                count++;
+                makeToast(MainActivity.this, "Yes!");
+            }
+
+            @Override
+            public void onAdapterAboutToEmpty(int itemsInAdapter) {
+                if(count==n){
+                makeToast(MainActivity.this, "No question more for now!");}
+            }
+
+            @Override
+            public void onScroll(float scrollProgressPercent) {
+                View view = flingContainer.getSelectedView();
+                view.findViewById(R.id.item_swipe_right_indicator).setAlpha(scrollProgressPercent < 0 ? -scrollProgressPercent : 0);
+                view.findViewById(R.id.item_swipe_left_indicator).setAlpha(scrollProgressPercent > 0 ? scrollProgressPercent : 0);
+            }
+        });
+
+    }
+    static void makeToast(Context ctx, String s){
+        Toast.makeText(ctx, s, Toast.LENGTH_SHORT).show();
     }
 
     //create a menu
@@ -103,34 +169,6 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent3 = new Intent(context, PhoneActivity.class);
                     startActivity(intent3);
                 }
-            }
-        });
-
-        //Questions
-        ImageButton trueButton = (ImageButton) findViewById(R.id.trueButton);
-        ImageButton falseButton = (ImageButton) findViewById(R.id.falseButton);
-
-        final TextView question = (TextView) findViewById(R.id.question);
-
-        //true is clicked
-        trueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                databaseHandler.answerQuestion(act_question,true);
-                System.out.println("answer:true");
-                act_question = databaseHandler.nextQuestion();
-                question.setText(act_question.createText());
-            }
-        });
-
-        //false is clicked
-        falseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                databaseHandler.answerQuestion(act_question,false);
-                System.out.println("answer:false");
-                act_question = databaseHandler.nextQuestion();
-                question.setText(act_question.createText());
             }
         });
     }

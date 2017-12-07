@@ -144,6 +144,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         onUpgrade(this.getReadableDatabase(), DATABASE_VERSION, DATABASE_VERSION);
     }
 
+public int getNumberOfQuestions(){
+        return countRows(TABLE_QUESTIONS);
+}
 
     public Question nextQuestion() {
         int randomQuestionId = ThreadLocalRandom.current().nextInt(1, countRows(TABLE_QUESTIONS) + 1);
