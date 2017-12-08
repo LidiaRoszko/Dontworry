@@ -30,6 +30,7 @@ public class HintActivity extends AppCompatActivity {
 
         //get hint with object of type EMPTY, PLACE*when there is no google maps integration to gos there
         act_hint = databaseHandler.nextHint();
+        System.out.println(act_hint);
         TextView hint = findViewById(R.id.hint);
         hint.setText(act_hint.createText());
     }
