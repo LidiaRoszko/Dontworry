@@ -16,7 +16,7 @@ public class HintActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        databaseHandler = new DatabaseHandler(this);
+        databaseHandler = DatabaseHandler.getInstance(this);
 
         //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);

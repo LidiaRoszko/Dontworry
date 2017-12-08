@@ -77,7 +77,7 @@ public class PhoneActivity extends AppCompatActivity {
                     ImageView imageView=(ImageView)findViewById(R.id.contactPhoto);
                     imageView.setImageURI(photoUri);
                     DisplayObject displayObject = new DisplayObject(ObjectType.CONTACT, person_to_call);
-                    DatabaseHandler databaseHandler = new DatabaseHandler(this);
+                    DatabaseHandler databaseHandler = DatabaseHandler.getInstance(this);
                     databaseHandler.addConnected(displayObject, 0 , 0);
                     System.out.println("new add to DB in PhoneActivity");
                 }

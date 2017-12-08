@@ -44,7 +44,16 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_OBJECT_ID = "object_id";
     private static final String KEY_TYPE = "type";
 
-    public DatabaseHandler(Context context) {
+    private static DatabaseHandler instance;
+
+    public static DatabaseHandler getInstance(Context context) {
+        if (instance == null)
+            instance = new DatabaseHandler(context);
+
+        return instance;
+    }
+
+    private DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
 

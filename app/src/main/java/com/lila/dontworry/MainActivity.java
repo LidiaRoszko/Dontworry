@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         //getWeather(); //only one per hour
         //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);
-        databaseHandler = new DatabaseHandler(getApplicationContext());
+        databaseHandler = DatabaseHandler.getInstance(this);
         n = databaseHandler.getNumberOfQuestions();
         setContentView(R.layout.activity_main);
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
