@@ -5,8 +5,6 @@ package com.lila.dontworry.Logic;
  */
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import android.content.ContentUris;
@@ -57,42 +55,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
 
-        wipeTables();
-
-        Question quest =new Question("Did you enjoy your call with %s?");
-        Question quest2 =new Question("Did you enjoy to visit %s?");
-        Question quest3 =new Question("Do you like to eat candy?");
-        Hint hint =  new Hint("Call %s.");
-        Hint hint2 =  new Hint("Visit %s.");
-        Hint hint3 =  new Hint("Eat some candy.");
-        DisplayObject obj = new DisplayObject(ObjectType.CONTACT, "Bodirsky");
-        DisplayObject obj2 = new DisplayObject(ObjectType.PLACE, "APB");
-
-        long qID = add(quest);
-        long qID2 = add(quest2);
-        long qID3 = add(quest3);
-        long hID = add(hint);
-        long hID2 = add(hint2);
-        long hID3 = add(hint3);
-        long oID = add(obj);
-        long oID2 = add(obj2);
-
-        quest = getQuestion((int)qID);
-        hint  = getHint((int)hID);
-        obj = getObject((int)oID);
-
-        quest2 = getQuestion((int)qID2);
-        hint2  = getHint((int)hID2);
-        obj2 = getObject((int)oID2);
-
-        quest3 = getQuestion((int)qID3);
-        hint3  = getHint((int)hID3);
-
-
-
-        addConnected(obj, (int)qID, (int)hID);
-        addConnected(obj2, (int)qID2, (int)hID2);
-
+        resetDatabase();
 
     }
 
@@ -153,18 +116,47 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         onUpgrade(this.getReadableDatabase(), DATABASE_VERSION, DATABASE_VERSION);
     }
 
-public int getNumberOfQuestions(){
+    public void resetDatabase() {
+        wipeTables();
+
+        Question quest =new Question("Did you enjoy your call with %s?");
+        Question quest2 =new Question("Did you enjoy to visit %s?");
+        Question quest3 =new Question("Do you like to eat candy?");
+        Hint hint =  new Hint("Call %s.");
+        Hint hint2 =  new Hint("Visit %s.");
+        Hint hint3 =  new Hint("Eat some candy.");
+        DisplayObject obj = new DisplayObject(ObjectType.CONTACT, "Bodirsky");
+        DisplayObject obj2 = new DisplayObject(ObjectType.PLACE, "APB");
+
+        long qID = add(quest);
+        long qID2 = add(quest2);
+        long qID3 = add(quest3);
+        long hID = add(hint);
+        long hID2 = add(hint2);
+        long hID3 = add(hint3);
+
+        addConnected(obj, (int)qID, (int)hID);
+        addConnected(obj2, (int)qID2, (int)hID2);
+    }
+
+    public int getNumberOfQuestions(){
         return countRows(TABLE_QUESTIONS);
 }
 
     public Question nextQuestion() {
-        int randomQuestionId = ThreadLocalRandom.current().nextInt(1, countRows(TABLE_QUESTIONS) + 1);
+        int rows = countRows(TABLE_QUESTIONS) + 1;
+        int randomQuestionId = 1;
+        if (rows > 1)
+            randomQuestionId = ThreadLocalRandom.current().nextInt(1, rows);
         return getQuestion(randomQuestionId);
     }
 
     public Hint nextHint() {
-        int randomQuestionId = ThreadLocalRandom.current().nextInt(1, countRows(TABLE_HINTS) + 1);
-        return getHint(randomQuestionId);
+        int rows = countRows(TABLE_HINTS) + 1;
+        int randomHintId = 1;
+        if (rows > 1)
+            randomHintId = ThreadLocalRandom.current().nextInt(1, rows);
+        return getHint(randomHintId);
 
     }
 
@@ -206,8 +198,8 @@ public int getNumberOfQuestions(){
 
 
     private void connectObject(DisplayObject displayObject, Question question) {
-        if (contains(TABLE_QUESTION_OBJECTS, KEY_QUESTION_ID, String.valueOf(question.getId())))
-            return;
+        //if (contains(TABLE_QUESTION_OBJECTS, KEY_QUESTION_ID, String.valueOf(question.getId())))
+        //    return;
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -221,8 +213,8 @@ public int getNumberOfQuestions(){
     }
 
     private void connectObject(DisplayObject displayObject, Hint hint) {
-        if (contains(TABLE_HINT_OBJECTS, KEY_HINT_ID, String.valueOf(hint.getId())))
-            return;
+        //if (contains(TABLE_HINT_OBJECTS, KEY_HINT_ID, String.valueOf(hint.getId())))
+        //    return;
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -417,82 +409,5 @@ public int getNumberOfQuestions(){
         return hint;
 
     }
-
-/*
-
-    // Getting single contact
-    Contact getContact(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_CONTACTS, new String[] { KEY_ID,
-                        KEY_NAME, KEY_PH_NO }, KEY_ID + "=?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
-        if (cursor != null)
-            cursor.moveToFirst();
-
-        Contact contact = new Contact(Integer.parseInt(cursor.getString(0)),
-                cursor.getString(1), cursor.getString(2));
-        // return contact
-        return contact;
-    }
-
-    // Getting All Contacts
-    public List<Contact> getAllContacts() {
-        List<Contact> contactList = new ArrayList<Contact>();
-        // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_CONTACTS;
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            do {
-                Contact contact = new Contact();
-                contact.setID(Integer.parseInt(cursor.getString(0)));
-                contact.setName(cursor.getString(1));
-                contact.setPhoneNumber(cursor.getString(2));
-                // Adding contact to list
-                contactList.add(contact);
-            } while (cursor.moveToNext());
-        }
-
-        // return contact list
-        return contactList;
-    }
-
-    // Updating single contact
-    public int updateContact(Contact contact) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, contact.getName());
-        values.put(KEY_PH_NO, contact.getPhoneNumber());
-
-        // updating row
-        return db.update(TABLE_CONTACTS, values, KEY_ID + " = ?",
-                new String[] { String.valueOf(contact.getID()) });
-    }
-
-    // Deleting single contact
-    public void deleteContact(Contact contact) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_CONTACTS, KEY_ID + " = ?",
-                new String[] { String.valueOf(contact.getID()) });
-        db.close();
-    }
-
-
-    // Getting contacts Count
-    public int getContactsCount() {
-        String countQuery = "SELECT  * FROM " + TABLE_CONTACTS;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        cursor.close();
-
-        // return count
-        return cursor.getCount();
-    }
-    */
 
 }
