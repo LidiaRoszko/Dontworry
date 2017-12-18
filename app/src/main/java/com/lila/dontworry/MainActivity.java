@@ -1,6 +1,6 @@
 package com.lila.dontworry;
-//https://github.com/Diolor/Swipecards
-
+// https://github.com/Diolor/Swipecards - swiping of the question
+// www.androstock.com - getting the weather
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -12,9 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.Toast;
-
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Function;
@@ -23,7 +22,7 @@ import com.lila.dontworry.Logic.Question;
 import com.lila.dontworry.Logic.Weather;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity { // answering the questions or getting hints + downloading of the events, weather and saving in DB
 
     private int n; //number of hints
     DatabaseHandler databaseHandler;
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private void getWeather(){
         Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
             public void processFinish(Boolean isSunny, Boolean isSnow, String weather_city, String weather_description, String weather_temperature, String weather_humidity, String weather_pressure) {
-                Weather.getInstance(isSunny, isSnow, weather_city, weather_description, weather_temperature, weather_humidity, weather_pressure);
+                Weather.getInstance(isSunny, isSnow, weather_city, weather_description, weather_temperature, weather_humidity, weather_pressure, new Date());
                 System.out.println("new weather");
             }
         });
@@ -46,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //getWeather(); //only one per hour
+        if(Weather.getDate()==null){getWeather();} //only one per hour, without connection ist still true up to 2 hours
+        // getEvents(); // only one per day with wifi, when older than 2 days then can be downloaded with mobile Internet
+
         //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);
         databaseHandler = new DatabaseHandler(getApplicationContext());
@@ -115,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
     static void makeToast(Context ctx, String s){
-        Toast.makeText(ctx, s, Toast.LENGTH_SHORT).show();
     }
 
     //create a menu
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 Random randomGenerator = new Random();
-                int number = randomGenerator.nextInt(4);
+                int number = randomGenerator.nextInt(5);
                 if(number==1||number==2) {
                     if(Weather.getIsSunny()||Weather.getIsSnow()){
                         Intent intent1 = new Intent(context, WeatherActivity.class);
@@ -163,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else if(number==3){
                     Intent intent2 = new Intent(context, HintActivity.class);
+                    startActivity(intent2);
+                }
+                else if(number==4){
+                    Intent intent2 = new Intent(context, YoutubePlayer.class);
                     startActivity(intent2);
                 }
                 else{

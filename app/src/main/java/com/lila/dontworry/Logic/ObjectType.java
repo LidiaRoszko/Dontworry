@@ -8,5 +8,6 @@ public enum ObjectType {
     EMPTY,
     LINK,
     PLACE,
-    CONTACT
+    CONTACT,
+    WEATHER
 }

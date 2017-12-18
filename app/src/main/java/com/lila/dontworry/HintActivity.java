@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Hint;
 
-public class HintActivity extends AppCompatActivity {
+public class HintActivity extends AppCompatActivity { //written hint
 
     DatabaseHandler databaseHandler;
     Hint act_hint = Hint.getDefault();

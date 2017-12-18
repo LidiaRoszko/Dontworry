@@ -1,4 +1,5 @@
 package com.lila.dontworry.Logic;
+// www.androstock.com
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -13,9 +14,6 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Function {
-    // www.androstock.com
-    //changed by lila
-
     private static final String OPEN_WEATHER_MAP_URL = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric";
     private static final String OPEN_WEATHER_MAP_API = ""; //!!!
 
