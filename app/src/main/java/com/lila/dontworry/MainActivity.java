@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity { // answering the questions
 
         //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);
-        databaseHandler = new DatabaseHandler(getApplicationContext());
+        databaseHandler = DatabaseHandler.getInstance(this);
         n = databaseHandler.getNumberOfQuestions();
         setContentView(R.layout.activity_main);
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);

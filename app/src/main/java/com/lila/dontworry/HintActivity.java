@@ -16,7 +16,7 @@ public class HintActivity extends AppCompatActivity { //written hint
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        databaseHandler = new DatabaseHandler(this);
+        databaseHandler = DatabaseHandler.getInstance(this);
 
         //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);
@@ -30,6 +30,7 @@ public class HintActivity extends AppCompatActivity { //written hint
 
         //get hint with object of type EMPTY, PLACE*when there is no google maps integration to gos there
         act_hint = databaseHandler.nextHint();
+        System.out.println(act_hint);
         TextView hint = findViewById(R.id.hint);
         hint.setText(act_hint.createText());
     }

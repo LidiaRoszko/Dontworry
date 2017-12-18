@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.lila.dontworry.Logic.DBValues;
 import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.DisplayObject;
 import com.lila.dontworry.Logic.ObjectType;
@@ -77,8 +79,8 @@ public class PhoneActivity extends AppCompatActivity {
                     ImageView imageView=(ImageView)findViewById(R.id.contactPhoto);
                     imageView.setImageURI(photoUri);
                     DisplayObject displayObject = new DisplayObject(ObjectType.CONTACT, person_to_call);
-                    DatabaseHandler databaseHandler = new DatabaseHandler(this);
-                    databaseHandler.addConnected(displayObject, 0 , 0);
+                    DatabaseHandler databaseHandler = DatabaseHandler.getInstance(this);
+                    databaseHandler.addConnected(displayObject, DBValues.CONTACT_QUESTION, DBValues.CONTACT_HINT);
                     System.out.println("new add to DB in PhoneActivity");
                 }
 
