@@ -20,4 +20,10 @@
     <string name="title_activity_youtube_failure_recovery">YoutubeFailureRecoveryActivity</string>
     <string name="title_activity_you_tube">YouTubeActivity</string>
     <string name="helpInstruction">Hello!\n We want to make your mood better, you should set location (default one is Dresden) and enjoy the hints, we prepared for you: YouTube videos, walking, written hints, calling sb, events. \n Every day at 8 pm will come notification to check your mood, then you can see the statistics.\n Sorry for all bugs, we are only beginners by android.\n LiLa</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_qand_a">QandAActivity</string>
+    <string name="title_activity_statistic">StatisticActivity</string>
 </resources>

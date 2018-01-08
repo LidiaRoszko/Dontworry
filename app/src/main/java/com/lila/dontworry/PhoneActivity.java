@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.lila.dontworry.Logic.DBValues;
 import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.DisplayObject;

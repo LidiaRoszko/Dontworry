@@ -6,7 +6,7 @@ import java.util.Date;
  * Created by Lidia on 05.12.2017.
  */
 
-public class Weather { //Singleton to save the weather - has to be in DB at the end!
+public class Weather { //Singleton to save the weather TODO: to DB
 
     private static Boolean isSunny = true;
     private static Boolean isSnow = false;

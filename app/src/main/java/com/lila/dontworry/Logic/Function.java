@@ -1,5 +1,6 @@
 package com.lila.dontworry.Logic;
 // www.androstock.com
+//get weather
 
 import android.os.AsyncTask;
 import android.util.Log;

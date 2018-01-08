@@ -6,7 +6,7 @@ import com.google.android.gms.maps.model.LatLng;
  * Created by Lidia on 05.12.2017.
  */
 
-public class Localisation {
+public class Localisation { //TODO: to DB
     //dresden 51.06814779850998 13.763458840548992
     private static LatLng position = new LatLng(51.06814779850998,13.763458840548992);
 

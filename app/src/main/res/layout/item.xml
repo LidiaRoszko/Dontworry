@@ -21,7 +21,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_margin="10dp"
-        android:background="@color/darkgreen" />
+        android:background="@color/colorPrimaryDark" />
 
     <View
         android:id="@+id/item_swipe_right_indicator"
@@ -30,6 +30,6 @@
         android:layout_height="20dp"
         android:layout_margin="10dp"
         android:layout_gravity="right"
-        android:background="@color/darkgreen" />
+        android:background="@color/colorPrimaryDark" />
 
 </FrameLayout>

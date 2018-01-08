@@ -27,7 +27,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".Main2Activity"
             android:label="Don&apos;t worry">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -78,9 +78,14 @@
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
         <activity
-            android:name=".YouTubeActivity"
-            android:label="@string/title_activity_you_tube"
-            android:theme="@style/AppTheme"></activity>
+            android:name=".QandAActivity"
+            android:label="@string/title_activity_qand_a" />
+        <activity
+            android:name=".StatisticActivity"
+            android:label="@string/title_activity_statistic" />
+        <activity
+            android:name=".EventActivity"
+            android:label="EventActivity"/>
     </application>
 
 </manifest>
