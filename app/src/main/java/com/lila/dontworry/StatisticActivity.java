@@ -10,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public class StatisticActivity extends AppCompatActivity {
+public class StatisticActivity extends AppCompatActivity { //TODO:statistics hor + vert
     final Context context = this;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {

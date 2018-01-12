@@ -1,16 +1,14 @@
 package com.lila.dontworry;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.lila.dontworry.Logic.Weather;
+import com.lila.dontworry.Logic.WeatherSingleton;
 
-public class WeatherActivity extends AppCompatActivity {
+public class WeatherActivity extends AppCompatActivity { //TODO:layout
 
     private Context self = this;
     @Override
@@ -33,25 +31,21 @@ public class WeatherActivity extends AppCompatActivity {
         title = findViewById(R.id.title_weather);
         final ImageView icon = findViewById(R.id.weather_icon);
 
-        detailsField.setText(Weather.getWeather_description());
-        currentTemperatureField.setText(Weather.getWeather_temperature());
-        humidity_field.setText(Weather.getWeather_humidity());
-        cityField.setText(Weather.getWeather_city());
-        pressure_field.setText(Weather.getWeather_pressure());
+        detailsField.setText(WeatherSingleton.getWeather().getWeather_description());
+        currentTemperatureField.setText(WeatherSingleton.getWeather().getWeather_temperature());
+        humidity_field.setText(WeatherSingleton.getWeather().getWeather_humidity());
+        cityField.setText(WeatherSingleton.getWeather().getWeather_city());
+        pressure_field.setText(WeatherSingleton.getWeather().getWeather_pressure());
 
-        if(Weather.getIsSnow()){
+        if(WeatherSingleton.getWeather().getIsSnow()){
             title.setText("Do you want to build a snowman?");
             icon.setImageResource(R.mipmap.snow);
         }
 
-        if(Weather.getIsSunny()){
+        if(WeatherSingleton.getWeather().getIsSunny()){
             title.setText("Go for a walk!");
             icon.setImageResource(R.mipmap.sun);
         }
-
-
-
-
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item){

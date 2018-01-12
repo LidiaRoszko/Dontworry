@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/common_google_signin_btn_text_dark_default"
     tools:context="com.lila.dontworry.HelpActivity">
 
 
@@ -12,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_weight="1"
-        android:background="?attr/colorPrimary"
+        android:background="@color/colorPrimaryDark"
         android:elevation="4dp"
         android:theme="@style/abc"
         app:popupTheme="@style/AppTheme">
@@ -34,10 +35,9 @@
         <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="60dp"
             android:text="@string/helpInstruction"
-            android:textSize="20sp"
             android:textAlignment="center"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="78dp" />

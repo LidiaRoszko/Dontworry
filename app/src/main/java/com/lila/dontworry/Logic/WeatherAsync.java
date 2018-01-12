@@ -14,14 +14,13 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Function {
+public class WeatherAsync {
     private static final String OPEN_WEATHER_MAP_URL = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric";
-    private static final String OPEN_WEATHER_MAP_API = ""; //!!!
 
-    private static boolean isSunny(int actualId, long sunrise, long sunset) {
+    private static boolean isSunny(int actualId, long sunrise, long sunset) { //a sunny or cloudy day during before sunset
         long currentTime = new Date().getTime();
         if (currentTime >= sunrise && currentTime < sunset) {
-            if (actualId == 800 || actualId == 801) {
+            if (actualId == 800 || actualId == 801 || actualId == 802 || actualId == 803) {
                 return true;
             }
             return false;

@@ -1,4 +1,5 @@
 package com.lila.dontworry;
+// https://github.com/Diolor/Swipecards - swiping of the question
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +16,6 @@ import android.widget.ArrayAdapter;
 import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Question;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
-
 import java.util.ArrayList;
 
 public class QandAActivity extends AppCompatActivity {

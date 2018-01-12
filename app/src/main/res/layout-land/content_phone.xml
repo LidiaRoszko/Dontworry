@@ -6,36 +6,57 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.lila.dontworry.PhoneActivity"
+    android:background="@color/common_google_signin_btn_text_dark_default"
     tools:showIn="@layout/activity_phone">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_weight="1"
+        android:background="@color/colorPrimaryDark"
+        android:elevation="4dp"
+        android:theme="@style/abc"
+        app:popupTheme="@style/AppTheme">
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Don't worry"
+            android:textColor="@color/darkgreen"
+            android:textSize="30dp" />
+    </android.support.v7.widget.Toolbar>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteY="91dp">
 
-        <TextView
-            android:id="@+id/callText"
-            android:layout_width="match_parent"
+        <ListView
+            android:id="@+id/contactsList"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
-            android:scaleType="fitCenter"
-            android:text="@string/call"
-            android:textAlignment="center"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="55dp"
+            android:layout_weight="1">
+
+        </ListView>
 
         <ImageView
             android:id="@+id/contactPhoto"
-            android:layout_width="555dp"
-            android:layout_height="169dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="0dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="30dp"
             android:layout_weight="1"
+            android:scaleType="fitCenter"
             app:srcCompat="@mipmap/dontworryfragenzeichen" />
 
-    </LinearLayout>
 
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

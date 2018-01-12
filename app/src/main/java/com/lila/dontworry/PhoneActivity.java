@@ -22,7 +22,7 @@ import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.DisplayObject;
 import com.lila.dontworry.Logic.ObjectType;
 
-public class PhoneActivity extends AppCompatActivity {
+public class PhoneActivity extends AppCompatActivity { //TODO: horizontal
 
     private Context self = this;
     @Override
@@ -73,7 +73,7 @@ public class PhoneActivity extends AppCompatActivity {
 
                 if(person_to_call2!=""){
                     TextView t=(TextView)findViewById(R.id.callText);
-                    t.setText("You should call "+person_to_call2+"!");
+                    t.setText("You should call " + person_to_call2 + "!");
                     Uri photoUri = ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, Long.parseLong(photo_of_person2));
                     ImageView imageView=(ImageView)findViewById(R.id.contactPhoto);
                     imageView.setImageURI(photoUri);

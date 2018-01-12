@@ -26,26 +26,36 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.lila.dontworry.Logic.CustomAdapter;
 import com.lila.dontworry.Logic.Event;
 import com.lila.dontworry.Logic.Localisation;
-import com.lila.dontworry.Logic.Singleton;
-
+import com.lila.dontworry.Logic.EventSingleton;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-public class EventActivity extends AppCompatActivity implements OnMapReadyCallback { //TODO: change orientation
+public class EventActivity extends AppCompatActivity implements OnMapReadyCallback { //TODO: change orientation fixing bug
+
     ListView listView;
     OnMapReadyCallback context = this;
     ArrayList<Event> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.list = Singleton.getList();
-        setContentView(R.layout.activity_event);
+        super.onCreate(savedInstanceState);setContentView(R.layout.activity_event);
         listView = findViewById(R.id.eventList);
+        android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo Wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        Calendar c = Calendar.getInstance();
+
+        c.setTime(new Date()); // as key to get the right list
+        //
+        this.list = EventSingleton.getList();
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Wifi.isConnected()){
             SupportMapFragment supportMapFragment;
@@ -59,13 +69,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
             supportMapFragment.onDestroy();
         }
 
-        android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        loadList();
+        loadList();//load to the rows in view
     }
 
     @Override
@@ -140,9 +144,8 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
             try {
                 String location = place + " Dresden";
                 Geocoder gc = new Geocoder(this);
-                List<Address> addresses = gc.getFromLocationName(location, 1);
-
-                 for(Address a : addresses){
+                List<Address> as = gc.getFromLocationName(location, 2);
+                 for(Address a : as){
                     if(a.hasLatitude() && a.hasLongitude()){
                        l = new LatLng(a.getLatitude(), a.getLongitude());
                     }

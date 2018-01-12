@@ -14,20 +14,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 import com.lila.dontworry.Logic.DatabaseHandler;
-import com.lila.dontworry.Logic.Events;
-import com.lila.dontworry.Logic.Function;
+import com.lila.dontworry.Logic.EventAsync;
+import com.lila.dontworry.Logic.Weather;
+import com.lila.dontworry.Logic.WeatherAsync;
 import com.lila.dontworry.Logic.Localisation;
 import com.lila.dontworry.Logic.Question;
-import com.lila.dontworry.Logic.Weather;
+import com.lila.dontworry.Logic.WeatherSingleton;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
-public class MainActivity extends AppCompatActivity { // answering the questions or getting hints + downloading of the events, weather and saving in DB
+public class MainActivity extends AppCompatActivity { // TODO:delete
+// answering the questions or getting hints + downloading of the events, weather and saving in DB
 
     private int n; //number of hints
     DatabaseHandler databaseHandler;
@@ -39,9 +40,9 @@ public class MainActivity extends AppCompatActivity { // answering the questions
 
     //getting with rest the weather
     private void getWeather(){
-        Function.placeIdTask asyncTask = new Function.placeIdTask(new Function.AsyncResponse() {
+        WeatherAsync.placeIdTask asyncTask = new WeatherAsync.placeIdTask(new WeatherAsync.AsyncResponse() {
             public void processFinish(Boolean isSunny, Boolean isSnow, String weather_city, String weather_description, String weather_temperature, String weather_humidity, String weather_pressure) {
-                Weather.getInstance(isSunny, isSnow, weather_city, weather_description, weather_temperature, weather_humidity, weather_pressure, new Date());
+                WeatherSingleton.getInstance(new Weather(isSunny, isSnow, weather_city, weather_description, weather_temperature, weather_humidity, weather_pressure));
                 System.out.println("new weather");
             }
         });
@@ -49,12 +50,12 @@ public class MainActivity extends AppCompatActivity { // answering the questions
     }
 
     private void getEvents() throws IOException {
-        new Events().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/2018-01-07"));
+        new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/2018-01-07"));
          }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(Weather.getDate()==null){getWeather();} //only one per hour, without connection ist still true up to 2 hours
+       getWeather(); //only one per hour, without connection ist still true up to 2 hours
         // getEvents(); // only one per day with wifi, when older than 2 days then can be downloaded with mobile Internet
         try {
             getEvents();
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity { // answering the questions
                 Random randomGenerator = new Random();
                 int number = randomGenerator.nextInt(5);
                 if(number==1||number==2) {
-                    if(Weather.getIsSunny()||Weather.getIsSnow()){
+                    if(WeatherSingleton.getWeather().getIsSunny()|| WeatherSingleton.getWeather().getIsSnow()){
                         Intent intent1 = new Intent(context, WeatherActivity.class);
                         startActivity(intent1);
                     }

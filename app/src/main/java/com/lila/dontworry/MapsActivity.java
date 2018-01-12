@@ -1,7 +1,6 @@
 package com.lila.dontworry;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -54,8 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMapClick(LatLng pos)
             {
                 Localisation l = Localisation.getInstance(pos);
-                Intent intent = new Intent(self, MainActivity.class);
-                startActivity(intent);
+                finish();
             }
         });
     }

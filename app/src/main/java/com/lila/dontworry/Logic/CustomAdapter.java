@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Lidia on 08.01.2018.
- * Create a new Adapter to set in TextView textViewdp and textViewt :
+ * Create a new Adapter to set in TextView textViewdp and textViewt in EventActivty:
  * Title of event
  * Place, Date
  */
