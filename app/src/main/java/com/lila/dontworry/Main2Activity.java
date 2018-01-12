@@ -89,7 +89,8 @@ public class Main2Activity extends AppCompatActivity {
             }
 
             System.out.println("eeeeeeeeeee https://www.kulturkalender-dresden.de/alle-veranstaltungen/" + year +"-" + monthString + "-" +dayString);
-            new Events().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/" + year +"-" + monthString + "-" +dayString));
+            if (Utility.getConnectionType(this) != Utility.TYPE_DISCONNECTED)
+                new Events().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/" + year +"-" + monthString + "-" +dayString));
         } /*
         ArrayList<Event> l = new ArrayList<>();
         l.add(new Event("22.01.2003", "Semper Oper", "Gesprach" , "https://code.tutsplus.com/tutorials/launching-the-browser-from-your-android-applications-the-easy-way--mobile-2414")); l.add(new Event("24.01.2003", "Theaterplatz", "Gesprach2" , "https://code.tutsplus.com"));
