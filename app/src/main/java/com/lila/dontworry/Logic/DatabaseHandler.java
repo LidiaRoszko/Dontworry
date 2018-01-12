@@ -23,17 +23,19 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     // Database Name
     private static final String DATABASE_NAME = "DontWorryData";
 
-    // Contacts table name
-
+    // table names
     private static final String TABLE_QUESTIONS = "questions";
     private static final String TABLE_HINTS = "hints";
     private static final String TABLE_RELEVANT_FOR = "relevant_for";
     private static final String TABLE_OBJECTS = "objects";
     private static final String TABLE_QUESTION_OBJECTS = "question_objects";
     private static final String TABLE_HINT_OBJECTS = "hint_objects";
+    private static final String TABLE_PLACES = "places";
+    private static final String TABLE_EVENTS = "events";
+    private static final String TABLE_WEATHER = "weather";
 
 
-    // Contacts Table Columns names
+    // Table Columns names
     private static final String KEY_QUESTION_ID = "question_id";
     private static final String KEY_TEXT = "text";
     private static final String KEY_ANSWER = "answer";
@@ -41,6 +43,20 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_HINT_ID = "hint_id";
     private static final String KEY_OBJECT_ID = "object_id";
     private static final String KEY_TYPE = "type";
+    // ###
+
+    private static final String KEY_PLACE_ID = "place_id";
+    private static final String KEY_LONG = "longitude";
+    private static final String KEY_LAT = "latitude";
+    private static final String KEY_EVENT_ID = "event_id";
+    private static final String KEY_DATE = "date";
+    private static final String KEY_PLACE = "place";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_LINK = "link";
+
+
+
+
 
     private static DatabaseHandler instance;
 
@@ -90,6 +106,22 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 + KEY_HINT_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
         db.execSQL(CREATE_HINT_OBJECTS_TABLE);
 
+        // ###
+
+        String CREATE_PLACES_TABLE = "CREATE TABLE " + TABLE_PLACES + "("
+                + KEY_PLACE_ID + " INTEGER," + KEY_LONG + " DOUBLE," + KEY_LAT + " DOUBLE," + " PRIMARY KEY (" + KEY_PLACE_ID + ")" + ")";
+        db.execSQL(CREATE_PLACES_TABLE);
+
+        String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + "("
+                + KEY_EVENT_ID + " INTEGER," + KEY_DATE + " TEXT," + KEY_PLACE + " TEXT," + KEY_TITLE + " TEXT," + KEY_LINK + " TEXT," + " PRIMARY KEY (" + KEY_EVENT_ID + ")" + ")";
+        db.execSQL(CREATE_HINT_OBJECTS_TABLE);
+
+
+        /*
+        String CREATE_WEATHER_TABLE = "CREATE TABLE " + TABLE_WEATHER + "("
+                + KEY_HINT_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
+        db.execSQL(CREATE_HINT_OBJECTS_TABLE);
+        */
     }
 
     // Upgrading database
@@ -102,6 +134,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_OBJECTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTION_OBJECTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_HINT_OBJECTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLACES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENTS);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_WEATHER);
 
 
         // Create tables again
