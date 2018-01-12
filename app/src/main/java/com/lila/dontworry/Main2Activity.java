@@ -63,6 +63,8 @@ public class Main2Activity extends AppCompatActivity { //TODO: change name
             }
         });
         asyncTask.execute(String.valueOf(Localisation.getL1()), String.valueOf(Localisation.getL2())); //  asyncTask.execute("Latitude", "Longitude")
+            if (Utility.getConnectionType(this) != Utility.TYPE_DISCONNECTED)
+                new Events().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/" + year +"-" + monthString + "-" +dayString));
     }
 
     public void addListenerOnButton() {
