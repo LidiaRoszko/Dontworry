@@ -53,6 +53,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_PLACE = "place";
     private static final String KEY_TITLE = "title";
     private static final String KEY_LINK = "link";
+    private static final String KEY_POS = "position";
+
 
 
 
@@ -113,8 +115,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.execSQL(CREATE_PLACES_TABLE);
 
         String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + "("
-                + KEY_EVENT_ID + " INTEGER," + KEY_DATE + " TEXT," + KEY_PLACE + " TEXT," + KEY_TITLE + " TEXT," + KEY_LINK + " TEXT," + " PRIMARY KEY (" + KEY_EVENT_ID + ")" + ")";
-        db.execSQL(CREATE_HINT_OBJECTS_TABLE);
+                + KEY_EVENT_ID + " INTEGER," + KEY_DATE + " TEXT," + KEY_PLACE + " TEXT," + KEY_TITLE + " TEXT," + KEY_LINK + " TEXT," + KEY_POS + " INTEGER, " + " PRIMARY KEY (" + KEY_EVENT_ID + ")" + ")";
+        db.execSQL(CREATE_EVENTS_TABLE);
 
 
         /*
@@ -151,15 +153,46 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         onUpgrade(this.getReadableDatabase(), DATABASE_VERSION, DATABASE_VERSION);
     }
 
+
+    private void addQuestionHint(String questionText, String hintText, boolean inverted) {
+        Question quest =new Question(questionText);
+        Hint hint =  new Hint(hintText);
+        long qID = add(quest);
+        long hID = add(hint);
+        connectQH((int)qID, (int)hID, inverted);
+    }
+
+    private void connectQH(int qId, int hId, boolean inverted) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_QUESTION_ID, qId);
+        values.put(KEY_HINT_ID, hId);
+        values.put(KEY_INVERTED, inverted);
+
+        // Inserting Row
+        db.insert(TABLE_RELEVANT_FOR, null, values);
+        db.close(); // Closing database connection
+    }
+
     public void resetDatabase() {
         wipeTables();
 
-        Question quest =new Question("Did you enjoy your call with %s?");
-        Question quest2 =new Question("Did you enjoy to visit %s?");
-        Question quest3 =new Question("Do you like to eat candy?");
-        Hint hint =  new Hint("Call %s.");
-        Hint hint2 =  new Hint("Visit %s.");
-        Hint hint3 =  new Hint("Eat some candy.");
+        addQuestionHint("Did you enjoy your call with %s?", "Call %s.", false);
+        addQuestionHint("Did you enjoy to visit %s?", "Visit %s.", false);
+        addQuestionHint("Do you like to eat candy?", "Eat some candy.", false);
+        addQuestionHint("Do you like to drink?", "Go out and have a drink!", false);
+        addQuestionHint("Did you sleep well?", "Go to bed 1 hour earlier today!", false);
+        addQuestionHint("Did you do any sports today?", "Jump around 20 times!", false);
+        /*
+        addQuestionHint("", "", false);
+        addQuestionHint("", "", false);
+        addQuestionHint("", "", false);
+        addQuestionHint("", "", false);
+        addQuestionHint("", "", false);
+        */
+
+        /*
         DisplayObject obj = new DisplayObject(ObjectType.CONTACT, "Bodirsky");
         DisplayObject obj2 = new DisplayObject(ObjectType.PLACE, "APB");
 
@@ -172,6 +205,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         addConnected(obj, (int)qID, (int)hID);
         addConnected(obj2, (int)qID2, (int)hID2);
+        */
     }
 
     public int getNumberOfQuestions(){
@@ -421,6 +455,33 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         return question;
     }
+
+    public Question getQuestion(String questionText) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursorQuest = db.query(TABLE_QUESTIONS, null, KEY_TEXT + " = ?",
+                new String[] { String.valueOf(questionText) }, null, null, null, null);
+
+
+
+        Question question = Question.getDefault();
+        if (cursorQuest != null) {
+            if (cursorQuest.getCount() > 0) {
+                cursorQuest.moveToFirst();
+                int q_id = cursorQuest.getInt(0);
+                String q_text = cursorQuest.getString(1);
+                boolean q_answer = cursorQuest.getInt(2) != 0;
+                DisplayObject q_obj = getObject(q_id, TABLE_QUESTION_OBJECTS);
+                question = new Question(q_text, q_id, q_answer, q_obj);
+                cursorQuest.close();
+            }
+        }
+
+        db.close();
+
+        return question;
+    }
+
 
     private Hint getHint(int hintId) {
         SQLiteDatabase db = this.getReadableDatabase();
