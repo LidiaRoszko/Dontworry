@@ -100,7 +100,8 @@ public class MainActivity extends AppCompatActivity { // TODO:delete
 
             @Override
             public void onLeftCardExit(Object dataObject) {
-                databaseHandler.answerQuestion(a2.get(count),false);
+                Question question = databaseHandler.getQuestion((String)dataObject);
+                databaseHandler.answerQuestion(question,false);
                 System.out.println("answer:false");
                 count++;
                 makeToast(MainActivity.this, "No!");
@@ -108,7 +109,9 @@ public class MainActivity extends AppCompatActivity { // TODO:delete
 
             @Override
             public void onRightCardExit(Object dataObject) {
-                databaseHandler.answerQuestion(a2.get(count),true);
+                Question question = databaseHandler.getQuestion((String)dataObject);
+                // a2.get(count)
+                databaseHandler.answerQuestion(question,true);
                 System.out.println("answer:true");
                 count++;
                 makeToast(MainActivity.this, "Yes!");
