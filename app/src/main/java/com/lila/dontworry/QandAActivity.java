@@ -65,6 +65,7 @@ public class QandAActivity extends AppCompatActivity {
 
         databaseHandler = DatabaseHandler.getInstance(this);
         n = databaseHandler.getNumberOfQuestions();
+        n = 1;
         //QUESTIONSs
         //act_question = databaseHandler.nextQuestion();
         al = new ArrayList<>(); //array of questions' strings

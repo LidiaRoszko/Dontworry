@@ -39,11 +39,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_QUESTION_ID = "question_id";
     private static final String KEY_TEXT = "text";
     private static final String KEY_ANSWER = "answer";
+    private static final String KEY_PERMA = "permanent";
     private static final String KEY_INVERTED = "inverted";
     private static final String KEY_HINT_ID = "hint_id";
     private static final String KEY_OBJECT_ID = "object_id";
     private static final String KEY_TYPE = "type";
-    // ###
 
     private static final String KEY_PLACE_ID = "place_id";
     private static final String KEY_LONG = "longitude";
@@ -82,10 +82,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_QUESTIONS_TABLE = "CREATE TABLE " + TABLE_QUESTIONS + "("
                 + KEY_QUESTION_ID + " INTEGER PRIMARY KEY," + KEY_TEXT + " TEXT,"
-                + KEY_ANSWER + " INTEGER" + ")";
+                + KEY_ANSWER + " INTEGER, " + KEY_PERMA + " INTEGER" + ")";
         db.execSQL(CREATE_QUESTIONS_TABLE);
 
-        //System.out.println(CREATE_QUESTIONS_TABLE);
+        System.out.println(CREATE_QUESTIONS_TABLE);
 
         String CREATE_HINTS_TABLE = "CREATE TABLE " + TABLE_HINTS + "("
                 + KEY_HINT_ID + " INTEGER PRIMARY KEY," + KEY_TEXT + " TEXT"
@@ -156,8 +156,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     }
 
 
-    private void addQuestionHint(String questionText, String hintText, boolean inverted) {
+    private void addQuestionHint(String questionText, String hintText, boolean inverted, boolean permanent) {
         Question quest =new Question(questionText);
+        quest.setPermanent(permanent);
         Hint hint =  new Hint(hintText);
         long qID = add(quest);
         long hID = add(hint);
@@ -180,19 +181,19 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     public void resetDatabase() {
         wipeTables();
 
-        addQuestionHint("Did you enjoy your call with %s?", "Call %s.", false);
-        addQuestionHint("Did you enjoy to visit %s?", "Visit %s.", false);
-        addQuestionHint("Do you like to eat candy?", "Eat some candy.", false);
-        addQuestionHint("Do you like to drink?", "Go out and have a drink!", false);
-        addQuestionHint("Did you sleep well?", "Go to bed 1 hour earlier today!", true);
-        addQuestionHint("Did you do any sports today?", "Jump around 20 times!", true);
-        addQuestionHint("Did you eat any fruits today?", "Eat a big banana!", true);
-        addQuestionHint("Did you receive love today?", "Invite your beloved person!", true);
-        addQuestionHint("Did you see the sun today?", "#Bild der Sonne", true);
-        addQuestionHint("Did you have fun today?", "#Witz", true);
-        addQuestionHint("Have you been to cinema recently?", "#Kinoprogramm", true);
-        addQuestionHint("Do you like Italian food?", "#Italienische Restaurants", false);
-        addQuestionHint("Have you called your grandma today?", "Call your grandma, she will be happy!", true);
+        addQuestionHint("Did you enjoy your call with %s?", "Call %s.", false, true);
+        addQuestionHint("Did you enjoy to visit %s?", "Visit %s.", false, true);
+        addQuestionHint("Do you like to eat candy?", "Eat some candy.", false, false);
+        addQuestionHint("Do you like to drink?", "Go out and have a drink!", false, false);
+        addQuestionHint("Did you sleep well?", "Go to bed 1 hour earlier today!", true, true);
+        addQuestionHint("Did you do any sports today?", "Jump around 20 times!", true, true);
+        addQuestionHint("Did you eat any fruits today?", "Eat a big banana!", true, true);
+        addQuestionHint("Did you receive love today?", "Invite your beloved person!", true, true);
+        addQuestionHint("Did you see the sun today?", "#Bild der Sonne", true, true);
+        addQuestionHint("Did you have fun today?", "#Witz", true, true);
+        addQuestionHint("Have you been to cinema recently?", "#Kinoprogramm", true, true);
+        addQuestionHint("Do you like Italian food?", "#Italienische Restaurants", false, false);
+        addQuestionHint("Have you called your grandma today?", "Call your grandma, she will be happy!", true, true);
 
 
         /*
@@ -216,11 +217,45 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 }
 
     public Question nextQuestion() {
+        /*
         int rows = countRows(TABLE_QUESTIONS) + 1;
         int randomQuestionId = 1;
         if (rows > 1)
             randomQuestionId = ThreadLocalRandom.current().nextInt(1, rows);
         return getQuestion(randomQuestionId);
+        */
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursorQuest = db.query(TABLE_QUESTIONS, null, null,
+                null, null, null, "ABS("+ KEY_ANSWER + ")", null);
+
+        Question question = Question.getDefault();
+        if (cursorQuest != null) {
+            if (cursorQuest.getCount() > 0) {
+                cursorQuest.moveToFirst();
+
+                while (!cursorQuest.isLast()){
+                    int q_id = cursorQuest.getInt(0);
+                    String q_text = cursorQuest.getString(1);
+                    int q_answer = cursorQuest.getInt(2);
+                    boolean q_permanent = cursorQuest.getInt(3) == 1;
+                    DisplayObject q_obj = getObject(q_id, TABLE_QUESTION_OBJECTS);
+                    question = new Question(q_text, q_id, q_answer, q_obj);
+                    question.setPermanent(q_permanent);
+                    System.out.println(question.toString());
+                    if ((!question.isPermanent() && question.getAnswer() == 0) || question.isPermanent())
+                        break;
+                    cursorQuest.moveToNext();
+                }
+                cursorQuest.close();
+
+            }
+        }
+
+        db.close();
+
+        return question;
     }
 
     public Hint nextHint() {
@@ -305,7 +340,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_ANSWER, answer ? "1" : "0");
+        values.put(KEY_ANSWER, question.getAnswer() + (answer ? 1 : -1));
 
         // updating row
         int result = db.update(TABLE_QUESTIONS, values, KEY_QUESTION_ID + "=?",
@@ -321,7 +356,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         ContentValues values = new ContentValues();
         values.put(KEY_TEXT, question.getText());
-        values.put(KEY_ANSWER, question.isAnswer() ? 1 : 0);
+        //values.put(KEY_ANSWER, question.isAnswer() ? 1 : 0);
+        values.put(KEY_ANSWER, question.getAnswer());
+        values.put(KEY_PERMA, question.isPermanent() ? 1 : 0);
 
         // Inserting Row
         long id = db.insert(TABLE_QUESTIONS, null, values);
@@ -449,7 +486,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 cursorQuest.moveToFirst();
                 int q_id = cursorQuest.getInt(0);
                 String q_text = cursorQuest.getString(1);
-                boolean q_answer = cursorQuest.getInt(2) != 0;
+                int q_answer = cursorQuest.getInt(2);
                 DisplayObject q_obj = getObject(questionId, TABLE_QUESTION_OBJECTS);
                 question = new Question(q_text, q_id, q_answer, q_obj);
                 cursorQuest.close();
@@ -473,7 +510,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 cursorQuest.moveToFirst();
                 int q_id = cursorQuest.getInt(0);
                 String q_text = cursorQuest.getString(1);
-                boolean q_answer = cursorQuest.getInt(2) != 0;
+                int q_answer = cursorQuest.getInt(2);
                 DisplayObject q_obj = getObject(q_id, TABLE_QUESTION_OBJECTS);
                 question = new Question(q_text, q_id, q_answer, q_obj);
                 cursorQuest.close();

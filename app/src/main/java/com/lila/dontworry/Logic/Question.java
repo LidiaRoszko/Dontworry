@@ -8,16 +8,17 @@ package com.lila.dontworry.Logic;
 public class Question {
     private String text;
     private int id;
-    private boolean answer;
-    DisplayObject displayObject;
+    private int answer;
+    private boolean permanent = false;
+    private DisplayObject displayObject;
 
-    public Question(String text, int id, boolean answer) {
+    public Question(String text, int id, int answer) {
         this.text = text;
         this.id = id;
         this.answer = answer;
     }
 
-    public Question(String text, int id, boolean answer, DisplayObject displayObject) {
+    public Question(String text, int id, int answer, DisplayObject displayObject) {
         this.text = text;
         this.id = id;
         this.answer = answer;
@@ -44,12 +45,20 @@ public class Question {
         this.id = id;
     }
 
-    public boolean isAnswer() {
+    public int getAnswer() {
         return answer;
     }
 
-    public void setAnswer(boolean answer) {
+    public void setAnswer(int answer) {
         this.answer = answer;
+    }
+
+    public boolean isPermanent() {
+        return permanent;
+    }
+
+    public void setPermanent(boolean permanent) {
+        this.permanent = permanent;
     }
 
     public DisplayObject getDisplayObject() {
@@ -86,7 +95,7 @@ public class Question {
 
     @Override
     public String toString() {
-        return "Question " + text + " " + id + " " + answer;
+        return "Question " + text + " " + id + " " + answer + " " + (permanent ? "permanent":"not permanent");
     }
 
     public boolean equals(Question question) {
@@ -101,7 +110,7 @@ public class Question {
     }
 
     public static Question getDefault() {
-        return new Question("Keine Frage vorhanden.", Integer.MAX_VALUE, false );
+        return new Question("Keine Frage vorhanden.", Integer.MAX_VALUE, 0 );
     }
 
     private ObjectType getType() {
