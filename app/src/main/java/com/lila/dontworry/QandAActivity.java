@@ -66,16 +66,19 @@ public class QandAActivity extends AppCompatActivity {
         databaseHandler = DatabaseHandler.getInstance(this);
         n = databaseHandler.getNumberOfQuestions();
         //QUESTIONSs
-        act_question = databaseHandler.nextQuestion();
+        //act_question = databaseHandler.nextQuestion();
         al = new ArrayList<>(); //array of questions' strings
         a2 = new ArrayList<>(); //array of questions
         Log.d("vor n", String.valueOf(n));
         for(int i = 0; n > i ; i++){
+            addQuestion();
+            /*
             Log.d("i ", String.valueOf(i));
             al.add(act_question.createText());
             Log.d("question ",act_question.createText());
             a2.add(act_question);
             act_question = databaseHandler.nextQuestion();
+            */
         }
 
         arrayAdapter = new ArrayAdapter(this, R.layout.item, R.id.helloText, al );
@@ -97,6 +100,7 @@ public class QandAActivity extends AppCompatActivity {
                 System.out.println("answer:false");
                 count++;
                 makeToast(QandAActivity.this, "No!");
+                addQuestion();
             }
 
             @Override
@@ -105,6 +109,7 @@ public class QandAActivity extends AppCompatActivity {
                 System.out.println("answer:true");
                 count++;
                 makeToast(QandAActivity.this, "Yes!");
+                addQuestion();
             }
 
             @Override
@@ -122,6 +127,13 @@ public class QandAActivity extends AppCompatActivity {
         });
 
     }
+
+    private void addQuestion() {
+        act_question = databaseHandler.nextQuestion();
+        al.add(act_question.createText());
+        a2.add(act_question);
+    }
+
     static void makeToast(Context ctx, String s){
     }
     //create a menu
@@ -148,3 +160,4 @@ public class QandAActivity extends AppCompatActivity {
         return false;
     }
 }
+
