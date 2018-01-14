@@ -4,7 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-public class HelpActivity extends AppCompatActivity { //explanation of the app TODO:adjusting layout
+public class HelpActivity extends AppCompatActivity { //explanation of the app
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

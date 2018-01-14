@@ -13,7 +13,7 @@
         android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="25sp"
-        tools:text="@string/get_hint" />
+        tools:text="" />
 
     <View
         android:id="@+id/item_swipe_left_indicator"

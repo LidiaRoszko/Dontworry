@@ -13,10 +13,10 @@
     <string name="nice">It is nice outside!</string>
     <string name="title_activity_maps">Map</string>
     <string name="setLocation">Set Location</string>
-
+    <string name="moodReview">Which mood did you have yesterday?</string>
+    <string name="yourStatistics">Your mood statistics</string>
     <string name="youtube_name">YoutubeSample</string>
     <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>
-
     <string name="title_activity_youtube_failure_recovery">YoutubeFailureRecoveryActivity</string>
     <string name="title_activity_you_tube">YouTubeActivity</string>
     <string name="helpInstruction">Hello!\n We want to make your mood better, you should set location (default one is Dresden) and enjoy the hints, we prepared for you: YouTube videos, walking, written hints, calling sb, events. \n Every day at 8 pm will come notification to check your mood, then you can see the statistics.\n Sorry for all bugs, we are only beginners by android.\n LiLa</string>
@@ -26,4 +26,5 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_qand_a">QandAActivity</string>
     <string name="title_activity_statistic">StatisticActivity</string>
+    <string name="title_activity_statistics">StatisticsActivity</string>
 </resources>

@@ -5,6 +5,7 @@ package com.lila.dontworry.Logic;
  */
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import android.content.ContentUris;
@@ -23,8 +24,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     // Database Name
     private static final String DATABASE_NAME = "DontWorryData";
 
-    // Contacts table name
-
+    // table names
     private static final String TABLE_QUESTIONS = "questions";
     private static final String TABLE_HINTS = "hints";
     private static final String TABLE_RELEVANT_FOR = "relevant_for";
@@ -33,7 +33,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String TABLE_HINT_OBJECTS = "hint_objects";
 
 
-    // Contacts Table Columns names
+    // Table Columns names
     private static final String KEY_QUESTION_ID = "question_id";
     private static final String KEY_TEXT = "text";
     private static final String KEY_ANSWER = "answer";
@@ -41,6 +41,20 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_HINT_ID = "hint_id";
     private static final String KEY_OBJECT_ID = "object_id";
     private static final String KEY_TYPE = "type";
+    // ###
+
+    private static final String KEY_PLACE_ID = "place_id";
+    private static final String KEY_LONG = "longitude";
+    private static final String KEY_LAT = "latitude";
+    private static final String KEY_EVENT_ID = "event_id";
+    private static final String KEY_DATE = "date";
+    private static final String KEY_PLACE = "place";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_LINK = "link";
+
+    private ArrayList<Question> list;
+
+
 
     private static DatabaseHandler instance;
 
@@ -90,6 +104,14 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 + KEY_HINT_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
         db.execSQL(CREATE_HINT_OBJECTS_TABLE);
 
+        // ###
+
+
+        /*
+        String CREATE_WEATHER_TABLE = "CREATE TABLE " + TABLE_WEATHER + "("
+                + KEY_HINT_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
+        db.execSQL(CREATE_HINT_OBJECTS_TABLE);
+        */
     }
 
     // Upgrading database
@@ -102,6 +124,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_OBJECTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTION_OBJECTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_HINT_OBJECTS);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_WEATHER);
 
 
         // Create tables again
@@ -118,7 +141,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
     public void resetDatabase() {
         wipeTables();
-
+        list = new ArrayList<>();
         Question quest =new Question("Did you enjoy your call with %s?");
         Question quest2 =new Question("Did you enjoy to visit %s?");
         Question quest3 =new Question("Do you like to eat candy?");
@@ -127,7 +150,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         Hint hint3 =  new Hint("Eat some candy.");
         DisplayObject obj = new DisplayObject(ObjectType.CONTACT, "Bodirsky");
         DisplayObject obj2 = new DisplayObject(ObjectType.PLACE, "APB");
-
+        list.add(quest);
+        list.add(quest2);
+        list.add(quest3);
         long qID = add(quest);
         long qID2 = add(quest2);
         long qID3 = add(quest3);
@@ -142,6 +167,17 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     public int getNumberOfQuestions(){
         return countRows(TABLE_QUESTIONS);
 }
+
+    public Question searchQuestion(String text){
+        ArrayList<Question> list = this.list;
+
+        for(Question q : this.list){
+            if(text.equals(q.getText())){
+                return q;
+            }
+        };
+        return null;
+    }
 
     public Question nextQuestion() {
         int rows = countRows(TABLE_QUESTIONS) + 1;

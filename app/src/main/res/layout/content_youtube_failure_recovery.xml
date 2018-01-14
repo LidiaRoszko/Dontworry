@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.lila.dontworry.YoutubeFailureRecoveryActivity"
+    tools:context="com.lila.dontworry.YouTubeFailureRecoveryActivity"
     tools:showIn="@layout/activity_youtube_failure_recovery">
 
 </android.support.constraint.ConstraintLayout>
