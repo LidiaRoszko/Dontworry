@@ -100,14 +100,16 @@ public class MainActivity extends AppCompatActivity { // answering the questions
             @Override
             public void onLeftCardExit(Object dataObject) {
                 Question question = databaseHandler.getQuestion((String)dataObject);
+                System.out.println("left:: " + question.toString());
                 databaseHandler.answerQuestion(question,false);
-                System.out.println("answer:false");
+                System.out.println("answer:false###l");
                 count++;
                 makeToast(MainActivity.this, "No!");
             }
 
             @Override
             public void onRightCardExit(Object dataObject) {
+
                 Question question = databaseHandler.getQuestion((String)dataObject);
                 // a2.get(count)
                 databaseHandler.answerQuestion(question,true);

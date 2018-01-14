@@ -82,8 +82,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_QUESTIONS_TABLE = "CREATE TABLE " + TABLE_QUESTIONS + "("
                 + KEY_QUESTION_ID + " INTEGER PRIMARY KEY," + KEY_TEXT + " TEXT,"
-                + KEY_ANSWER + " BIT" + ")";
+                + KEY_ANSWER + " INTEGER" + ")";
         db.execSQL(CREATE_QUESTIONS_TABLE);
+
+        //System.out.println(CREATE_QUESTIONS_TABLE);
 
         String CREATE_HINTS_TABLE = "CREATE TABLE " + TABLE_HINTS + "("
                 + KEY_HINT_ID + " INTEGER PRIMARY KEY," + KEY_TEXT + " TEXT"
@@ -182,15 +184,16 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         addQuestionHint("Did you enjoy to visit %s?", "Visit %s.", false);
         addQuestionHint("Do you like to eat candy?", "Eat some candy.", false);
         addQuestionHint("Do you like to drink?", "Go out and have a drink!", false);
-        addQuestionHint("Did you sleep well?", "Go to bed 1 hour earlier today!", false);
-        addQuestionHint("Did you do any sports today?", "Jump around 20 times!", false);
-        /*
-        addQuestionHint("", "", false);
-        addQuestionHint("", "", false);
-        addQuestionHint("", "", false);
-        addQuestionHint("", "", false);
-        addQuestionHint("", "", false);
-        */
+        addQuestionHint("Did you sleep well?", "Go to bed 1 hour earlier today!", true);
+        addQuestionHint("Did you do any sports today?", "Jump around 20 times!", true);
+        addQuestionHint("Did you eat any fruits today?", "Eat a big banana!", true);
+        addQuestionHint("Did you receive love today?", "Invite your beloved person!", true);
+        addQuestionHint("Did you see the sun today?", "#Bild der Sonne", true);
+        addQuestionHint("Did you have fun today?", "#Witz", true);
+        addQuestionHint("Have you been to cinema recently?", "#Kinoprogramm", true);
+        addQuestionHint("Do you like Italian food?", "#Italienische Restaurants", false);
+        addQuestionHint("Have you called your grandma today?", "Call your grandma, she will be happy!", true);
+
 
         /*
         DisplayObject obj = new DisplayObject(ObjectType.CONTACT, "Bodirsky");
@@ -297,13 +300,15 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     }
 
     public int answerQuestion(Question question, boolean answer) {
+        System.out.println(question.toString() + " -> " + answer);
+
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_ANSWER, question.isAnswer());
+        values.put(KEY_ANSWER, answer ? "1" : "0");
 
         // updating row
-        int result = db.update(TABLE_QUESTIONS, values, KEY_QUESTION_ID + " = ?",
+        int result = db.update(TABLE_QUESTIONS, values, KEY_QUESTION_ID + "=?",
                 new String[] { String.valueOf(question.getId()) });
         db.close();
         return result;
@@ -316,7 +321,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         ContentValues values = new ContentValues();
         values.put(KEY_TEXT, question.getText());
-        values.put(KEY_ANSWER, question.isAnswer());
+        values.put(KEY_ANSWER, question.isAnswer() ? 1 : 0);
 
         // Inserting Row
         long id = db.insert(TABLE_QUESTIONS, null, values);
@@ -461,8 +466,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         Cursor cursorQuest = db.query(TABLE_QUESTIONS, null, KEY_TEXT + " = ?",
                 new String[] { String.valueOf(questionText) }, null, null, null, null);
-
-
 
         Question question = Question.getDefault();
         if (cursorQuest != null) {
