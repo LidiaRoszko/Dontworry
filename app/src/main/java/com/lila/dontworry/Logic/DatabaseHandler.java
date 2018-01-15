@@ -94,7 +94,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         String CREATE_RELEVANT_FOR_TABLE = "CREATE TABLE " + TABLE_RELEVANT_FOR + "("
                 + KEY_QUESTION_ID + " INTEGER," + KEY_HINT_ID + " INTEGER,"
-                + KEY_INVERTED + " BIT," + " PRIMARY KEY (" + KEY_QUESTION_ID + ", " + KEY_HINT_ID + ")" + ")";
+                + KEY_INVERTED + " INTEGER," + " PRIMARY KEY (" + KEY_QUESTION_ID + ", " + KEY_HINT_ID + ")" + ")";
         db.execSQL(CREATE_RELEVANT_FOR_TABLE);
 
         String CREATE_OBJECTS_TABLE = "CREATE TABLE " + TABLE_OBJECTS + "("
@@ -171,7 +171,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         ContentValues values = new ContentValues();
         values.put(KEY_QUESTION_ID, qId);
         values.put(KEY_HINT_ID, hId);
-        values.put(KEY_INVERTED, inverted);
+        values.put(KEY_INVERTED, inverted ? -1 : 1);
 
         // Inserting Row
         db.insert(TABLE_RELEVANT_FOR, null, values);
@@ -259,12 +259,57 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     }
 
     public Hint nextHint() {
+        /*
         int rows = countRows(TABLE_HINTS) + 1;
         int randomHintId = 1;
         if (rows > 1)
             randomHintId = ThreadLocalRandom.current().nextInt(1, rows);
         return getHint(randomHintId);
+*/
 
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        //Cursor cursor = db.query(TABLE_HINTS, null, KEY_HINT_ID + " = ?",
+        //        new String[] { String.valueOf(hintId) }, null, null, null, null);
+
+        String HINT_QUERY = "SELECT " + TABLE_HINTS + "." + KEY_HINT_ID + ", " + TABLE_HINTS + "." + KEY_TEXT + ", " +
+                TABLE_QUESTIONS + "." + KEY_ANSWER + ", " + TABLE_RELEVANT_FOR + "." + KEY_INVERTED + ", " +
+                TABLE_QUESTIONS + "." + KEY_QUESTION_ID +
+                " FROM (" + TABLE_QUESTIONS + " INNER JOIN " + TABLE_RELEVANT_FOR +
+                " ON " + TABLE_QUESTIONS + "." + KEY_QUESTION_ID + " = " + TABLE_RELEVANT_FOR + "." + KEY_QUESTION_ID + ")"+
+                " INNER JOIN " + TABLE_HINTS +
+                " ON " + TABLE_RELEVANT_FOR + "." + KEY_HINT_ID + " = " + TABLE_HINTS + "." + KEY_HINT_ID +
+                " ORDER BY " + KEY_ANSWER;
+
+        //System.out.println(HINT_QUERY);
+
+        Cursor cursor = db.rawQuery(HINT_QUERY, null);
+
+        Hint hint = Hint.getDefault();
+
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                System.out.println(cursor.getString(0) + cursor.getString(1));
+
+                int h_id = cursor.getInt(0);
+                String h_text = cursor.getString(1);
+                int h_inv = cursor.getInt(3);
+                DisplayObject h_obj = getObject(h_id, TABLE_HINT_OBJECTS);
+                //System.out.println(h_obj);
+                hint = new Hint(h_text, h_id, h_obj);
+                Question question = getQuestion(cursor.getInt(4));
+
+                answerQuestion(question, h_inv != -1);
+
+            }
+        }
+
+
+
+        cursor.close();
+        db.close();
+        return hint;
     }
 
 
@@ -335,6 +380,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     }
 
     public int answerQuestion(Question question, boolean answer) {
+        // TODO inverted answer
         System.out.println(question.toString() + " -> " + answer);
 
         SQLiteDatabase db = this.getWritableDatabase();
