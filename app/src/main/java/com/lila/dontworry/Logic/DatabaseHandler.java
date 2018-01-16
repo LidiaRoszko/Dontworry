@@ -5,6 +5,7 @@ package com.lila.dontworry.Logic;
  */
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import android.content.ContentUris;
@@ -13,6 +14,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.app.INotificationSideChannel;
 
 public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
@@ -259,40 +261,41 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     }
 
     public Hint nextHint() {
-        /*
-        int rows = countRows(TABLE_HINTS) + 1;
-        int randomHintId = 1;
-        if (rows > 1)
-            randomHintId = ThreadLocalRandom.current().nextInt(1, rows);
-        return getHint(randomHintId);
-*/
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        //Cursor cursor = db.query(TABLE_HINTS, null, KEY_HINT_ID + " = ?",
-        //        new String[] { String.valueOf(hintId) }, null, null, null, null);
-
-        String HINT_QUERY = "SELECT " + TABLE_HINTS + "." + KEY_HINT_ID + ", " + TABLE_HINTS + "." + KEY_TEXT + ", " +
-                TABLE_QUESTIONS + "." + KEY_ANSWER + ", " + TABLE_RELEVANT_FOR + "." + KEY_INVERTED + ", " +
-                TABLE_QUESTIONS + "." + KEY_QUESTION_ID +
+        String HINT_QUERY = "SELECT " + TABLE_HINTS + "." + KEY_HINT_ID + ", " +
+                TABLE_HINTS + "." + KEY_TEXT + ", " +
+                TABLE_QUESTIONS + "." + KEY_ANSWER + ", " +
+                TABLE_RELEVANT_FOR + "." + KEY_INVERTED + ", " +
+                TABLE_QUESTIONS + "." + KEY_QUESTION_ID + ", " +
+                TABLE_QUESTIONS + "." + KEY_PERMA +
                 " FROM (" + TABLE_QUESTIONS + " INNER JOIN " + TABLE_RELEVANT_FOR +
                 " ON " + TABLE_QUESTIONS + "." + KEY_QUESTION_ID + " = " + TABLE_RELEVANT_FOR + "." + KEY_QUESTION_ID + ")"+
                 " INNER JOIN " + TABLE_HINTS +
                 " ON " + TABLE_RELEVANT_FOR + "." + KEY_HINT_ID + " = " + TABLE_HINTS + "." + KEY_HINT_ID +
+                " WHERE " + TABLE_QUESTIONS + "." + KEY_PERMA + " = 1 OR " + TABLE_QUESTIONS + "." + KEY_ANSWER + " > 0" +
                 " ORDER BY " + TABLE_QUESTIONS + "." + KEY_ANSWER + " DESC";
 
-  //      System.out.println(HINT_QUERY);
+        //System.out.println(HINT_QUERY);
 
         Cursor cursor = db.rawQuery(HINT_QUERY, null);
-/*
+
+        /*
         cursor.moveToFirst();
-        while (!cursor.isLast())
+        while (true)
         {
-            System.out.println(cursor.getString(0) + cursor.getString(1) + cursor.getString(2));
+            for (int i = 0; i < 6; i++)
+                System.out.print(cursor.getString(i)+ ", ");
+            System.out.print("\n");
 
-            cursor.moveToNext();        }
+            if (cursor.isLast())
+                break;
 
-*/
+            cursor.moveToNext();
+        }
+        */
+
         Hint hint = Hint.getDefault();
 
         if (cursor != null) {
@@ -300,13 +303,37 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 cursor.moveToFirst();
                 System.out.println(cursor.getString(0) + cursor.getString(1));
 
+                int highest_answer = cursor.getInt(2);
+                ArrayList<Hint> hints = new ArrayList<>();
+                ArrayList<Integer> questionIds = new ArrayList<>();
+
+                while (cursor.getInt(2) == highest_answer)
+                {
+                    int h_id = cursor.getInt(0);
+                    String h_text = cursor.getString(1);
+                    DisplayObject h_obj = getObject(h_id, TABLE_HINT_OBJECTS);
+                    hints.add(new Hint(h_text, h_id, h_obj));
+                    questionIds.add(cursor.getInt(4));
+                    cursor.moveToNext();
+                    if (cursor.isAfterLast())
+                        break;
+                }
+
+                int randomHintIndex = ThreadLocalRandom.current().nextInt(0, hints.size());
+                //System.out.println("hint " + randomHintIndex);
+                hint = hints.get(randomHintIndex);
+
+                /*
                 int h_id = cursor.getInt(0);
                 String h_text = cursor.getString(1);
                 int h_inv = cursor.getInt(3);
+                int q_perma = cursor.getInt(5);
                 DisplayObject h_obj = getObject(h_id, TABLE_HINT_OBJECTS);
                 //System.out.println(h_obj);
                 hint = new Hint(h_text, h_id, h_obj);
-                Question question = getQuestion(cursor.getInt(4));
+                */
+
+                Question question = getQuestion(questionIds.get(randomHintIndex));
 
                 answerQuestion(question, false);
 
