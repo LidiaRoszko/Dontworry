@@ -279,12 +279,20 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 " ON " + TABLE_QUESTIONS + "." + KEY_QUESTION_ID + " = " + TABLE_RELEVANT_FOR + "." + KEY_QUESTION_ID + ")"+
                 " INNER JOIN " + TABLE_HINTS +
                 " ON " + TABLE_RELEVANT_FOR + "." + KEY_HINT_ID + " = " + TABLE_HINTS + "." + KEY_HINT_ID +
-                " ORDER BY " + KEY_ANSWER;
+                " ORDER BY " + TABLE_QUESTIONS + "." + KEY_ANSWER + " DESC";
 
-        //System.out.println(HINT_QUERY);
+  //      System.out.println(HINT_QUERY);
 
         Cursor cursor = db.rawQuery(HINT_QUERY, null);
+/*
+        cursor.moveToFirst();
+        while (!cursor.isLast())
+        {
+            System.out.println(cursor.getString(0) + cursor.getString(1) + cursor.getString(2));
 
+            cursor.moveToNext();        }
+
+*/
         Hint hint = Hint.getDefault();
 
         if (cursor != null) {
@@ -300,7 +308,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 hint = new Hint(h_text, h_id, h_obj);
                 Question question = getQuestion(cursor.getInt(4));
 
-                answerQuestion(question, h_inv != -1);
+                answerQuestion(question, false);
 
             }
         }
@@ -380,13 +388,26 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     }
 
     public int answerQuestion(Question question, boolean answer) {
-        // TODO inverted answer
-        System.out.println(question.toString() + " -> " + answer);
 
         SQLiteDatabase db = this.getWritableDatabase();
 
+        String INV_QUERY = "SELECT " + TABLE_HINTS + "." + KEY_HINT_ID + ", " + TABLE_RELEVANT_FOR + "." + KEY_INVERTED +
+                " FROM " + TABLE_RELEVANT_FOR + " INNER JOIN " + TABLE_HINTS +
+                " ON " + TABLE_RELEVANT_FOR + "." + KEY_HINT_ID + " = " + TABLE_HINTS + "." + KEY_HINT_ID;
+
+        //System.out.println(INV_QUERY);
+
+        Cursor cursor = db.rawQuery(INV_QUERY, null);
+        cursor.moveToFirst();
+        int h_inv = cursor.getInt(1);
+
+        //System.out.println(question.toString() + " answer: " + answer + " h_inv: " + h_inv);
+
+
         ContentValues values = new ContentValues();
-        values.put(KEY_ANSWER, question.getAnswer() + (answer ? 1 : -1));
+        values.put(KEY_ANSWER, question.getAnswer() + (answer ? 1 : -1) * h_inv);
+
+        //System.out.println(values.get(KEY_ANSWER));
 
         // updating row
         int result = db.update(TABLE_QUESTIONS, values, KEY_QUESTION_ID + "=?",
