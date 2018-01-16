@@ -5,6 +5,7 @@ package com.lila.dontworry.Logic;
  */
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import android.content.ContentUris;
@@ -13,6 +14,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.app.INotificationSideChannel;
 
 public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
@@ -94,7 +96,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         String CREATE_RELEVANT_FOR_TABLE = "CREATE TABLE " + TABLE_RELEVANT_FOR + "("
                 + KEY_QUESTION_ID + " INTEGER," + KEY_HINT_ID + " INTEGER,"
-                + KEY_INVERTED + " BIT," + " PRIMARY KEY (" + KEY_QUESTION_ID + ", " + KEY_HINT_ID + ")" + ")";
+                + KEY_INVERTED + " INTEGER," + " PRIMARY KEY (" + KEY_QUESTION_ID + ", " + KEY_HINT_ID + ")" + ")";
         db.execSQL(CREATE_RELEVANT_FOR_TABLE);
 
         String CREATE_OBJECTS_TABLE = "CREATE TABLE " + TABLE_OBJECTS + "("
@@ -171,7 +173,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         ContentValues values = new ContentValues();
         values.put(KEY_QUESTION_ID, qId);
         values.put(KEY_HINT_ID, hId);
-        values.put(KEY_INVERTED, inverted);
+        values.put(KEY_INVERTED, inverted ? -1 : 1);
 
         // Inserting Row
         db.insert(TABLE_RELEVANT_FOR, null, values);
@@ -259,12 +261,90 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     }
 
     public Hint nextHint() {
-        int rows = countRows(TABLE_HINTS) + 1;
-        int randomHintId = 1;
-        if (rows > 1)
-            randomHintId = ThreadLocalRandom.current().nextInt(1, rows);
-        return getHint(randomHintId);
 
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String HINT_QUERY = "SELECT " + TABLE_HINTS + "." + KEY_HINT_ID + ", " +
+                TABLE_HINTS + "." + KEY_TEXT + ", " +
+                TABLE_QUESTIONS + "." + KEY_ANSWER + ", " +
+                TABLE_RELEVANT_FOR + "." + KEY_INVERTED + ", " +
+                TABLE_QUESTIONS + "." + KEY_QUESTION_ID + ", " +
+                TABLE_QUESTIONS + "." + KEY_PERMA +
+                " FROM (" + TABLE_QUESTIONS + " INNER JOIN " + TABLE_RELEVANT_FOR +
+                " ON " + TABLE_QUESTIONS + "." + KEY_QUESTION_ID + " = " + TABLE_RELEVANT_FOR + "." + KEY_QUESTION_ID + ")"+
+                " INNER JOIN " + TABLE_HINTS +
+                " ON " + TABLE_RELEVANT_FOR + "." + KEY_HINT_ID + " = " + TABLE_HINTS + "." + KEY_HINT_ID +
+                " WHERE " + TABLE_QUESTIONS + "." + KEY_PERMA + " = 1 OR " + TABLE_QUESTIONS + "." + KEY_ANSWER + " > 0" +
+                " ORDER BY " + TABLE_QUESTIONS + "." + KEY_ANSWER + " DESC";
+
+        //System.out.println(HINT_QUERY);
+
+        Cursor cursor = db.rawQuery(HINT_QUERY, null);
+
+        /*
+        cursor.moveToFirst();
+        while (true)
+        {
+            for (int i = 0; i < 6; i++)
+                System.out.print(cursor.getString(i)+ ", ");
+            System.out.print("\n");
+
+            if (cursor.isLast())
+                break;
+
+            cursor.moveToNext();
+        }
+        */
+
+        Hint hint = Hint.getDefault();
+
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                System.out.println(cursor.getString(0) + cursor.getString(1));
+
+                int highest_answer = cursor.getInt(2);
+                ArrayList<Hint> hints = new ArrayList<>();
+                ArrayList<Integer> questionIds = new ArrayList<>();
+
+                while (cursor.getInt(2) == highest_answer)
+                {
+                    int h_id = cursor.getInt(0);
+                    String h_text = cursor.getString(1);
+                    DisplayObject h_obj = getObject(h_id, TABLE_HINT_OBJECTS);
+                    hints.add(new Hint(h_text, h_id, h_obj));
+                    questionIds.add(cursor.getInt(4));
+                    cursor.moveToNext();
+                    if (cursor.isAfterLast())
+                        break;
+                }
+
+                int randomHintIndex = ThreadLocalRandom.current().nextInt(0, hints.size());
+                //System.out.println("hint " + randomHintIndex);
+                hint = hints.get(randomHintIndex);
+
+                /*
+                int h_id = cursor.getInt(0);
+                String h_text = cursor.getString(1);
+                int h_inv = cursor.getInt(3);
+                int q_perma = cursor.getInt(5);
+                DisplayObject h_obj = getObject(h_id, TABLE_HINT_OBJECTS);
+                //System.out.println(h_obj);
+                hint = new Hint(h_text, h_id, h_obj);
+                */
+
+                Question question = getQuestion(questionIds.get(randomHintIndex));
+
+                answerQuestion(question, false);
+
+            }
+        }
+
+
+
+        cursor.close();
+        db.close();
+        return hint;
     }
 
 
@@ -335,12 +415,26 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     }
 
     public int answerQuestion(Question question, boolean answer) {
-        System.out.println(question.toString() + " -> " + answer);
 
         SQLiteDatabase db = this.getWritableDatabase();
 
+        String INV_QUERY = "SELECT " + TABLE_HINTS + "." + KEY_HINT_ID + ", " + TABLE_RELEVANT_FOR + "." + KEY_INVERTED +
+                " FROM " + TABLE_RELEVANT_FOR + " INNER JOIN " + TABLE_HINTS +
+                " ON " + TABLE_RELEVANT_FOR + "." + KEY_HINT_ID + " = " + TABLE_HINTS + "." + KEY_HINT_ID;
+
+        //System.out.println(INV_QUERY);
+
+        Cursor cursor = db.rawQuery(INV_QUERY, null);
+        cursor.moveToFirst();
+        int h_inv = cursor.getInt(1);
+
+        //System.out.println(question.toString() + " answer: " + answer + " h_inv: " + h_inv);
+
+
         ContentValues values = new ContentValues();
-        values.put(KEY_ANSWER, question.getAnswer() + (answer ? 1 : -1));
+        values.put(KEY_ANSWER, question.getAnswer() + (answer ? 1 : -1) * h_inv);
+
+        //System.out.println(values.get(KEY_ANSWER));
 
         // updating row
         int result = db.update(TABLE_QUESTIONS, values, KEY_QUESTION_ID + "=?",
