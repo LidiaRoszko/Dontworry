@@ -57,6 +57,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_LINK = "link";
     private static final String KEY_POS = "position";
 
+    private ArrayList<Question> list;
 
 
 
