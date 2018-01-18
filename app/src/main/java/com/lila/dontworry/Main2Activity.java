@@ -78,7 +78,8 @@ public class Main2Activity extends AppCompatActivity { //TODO: change name
             public void onClick(View arg0) {
                Random randomGenerator = new Random();
                 int number = randomGenerator.nextInt(5);
-                //number = 3;
+                if ((Utility.getConnectionType(context) != ConnectivityManager.TYPE_WIFI))
+                        number = 3;
                 if(number==1) {
                     if(WeatherSingleton.exist()){
                     if(WeatherSingleton.getWeather().getIsSunny()|| WeatherSingleton.getWeather().getIsSnow()){
@@ -104,10 +105,8 @@ public class Main2Activity extends AppCompatActivity { //TODO: change name
                     startActivity(intent2);
                 }
                 else if(number==4){
-                    if (Utility.getConnectionType(context) == ConnectivityManager.TYPE_WIFI) {
-                        Intent intent2 = new Intent(context, YoutubePlayer.class);
-                        startActivity(intent2);
-                    }
+                    Intent intent2 = new Intent(context, YoutubePlayer.class);
+                    startActivity(intent2);
                 }
                 else{
                     Intent intent3 = new Intent(context, PhoneActivity.class);
