@@ -23,7 +23,7 @@ import java.net.URL;
 import java.util.Random;
 
 public class Main2Activity extends AppCompatActivity { //TODO: change name
-
+/*
     final Context context = this;
 
     @Override
@@ -163,4 +163,5 @@ public class Main2Activity extends AppCompatActivity { //TODO: change name
             return false;
         }
     };
+*/
 }

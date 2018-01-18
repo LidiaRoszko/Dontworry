@@ -49,39 +49,33 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        ////TODO: CONNECTIVITY CHECK
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo Wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        Calendar c = Calendar.getInstance();
 
+        //TODO: DATABASE getEvents(today);
+        Calendar c = Calendar.getInstance();
         c.setTime(new Date()); // as key to get the right list
-        //
         this.list = EventSingleton.getList();
 
+        // if landscape orientation and wifi then launching a fragment with a map
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Wifi.isConnected()){
             SupportMapFragment supportMapFragment;
             supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentMap);
             supportMapFragment.onAttach(this);
             supportMapFragment.getMapAsync(context);
-        }
+        }// if landscape orientation and no wifi then no map
         else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !Wifi.isConnected()){
             SupportMapFragment supportMapFragment;
             supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentMap);
             supportMapFragment.onDestroy();
         }
-
-        loadList();//load to the rows in view
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
+        loadList();//load the list with events to the rows in listView
     }
 
     private void loadList() {
         customAdapter();
+        //action after click on event
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -113,6 +107,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         listView.setAdapter(adapter);
     }
 
+    //setting some GeoTags
     @Override
     public void onMapReady(GoogleMap mMap) {
         mMap.setMinZoomPreference(10);
@@ -128,16 +123,9 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
             }
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
-        /*
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                if(marker.getTitle().equals("Your localisation!")){return false;}
-                listView.performItemClick(listView, checkPosition(marker.getTitle()), listView.getItemIdAtPosition(checkPosition(marker.getTitle())));
-                return false;
-            }
-        });*/
     }
+
+    //searching for Lat and Lng of the event
     private LatLng checkLatLng(String place) {
         LatLng l = Localisation.getPosition();
         if(Geocoder.isPresent()){
@@ -156,10 +144,19 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         return l;
     }
 
-    // changing color of tags
+    // changing color of GeoTags
     public BitmapDescriptor getMarkerIcon(String color) {
         float[] hsv = new float[3];
         Color.colorToHSV(Color.parseColor(color), hsv);
         return BitmapDescriptorFactory.defaultMarker(hsv[0]);
+    }
+
+    //back arrow
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

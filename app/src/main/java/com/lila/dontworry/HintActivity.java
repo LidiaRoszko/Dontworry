@@ -3,12 +3,13 @@ package com.lila.dontworry;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Hint;
 
-public class HintActivity extends AppCompatActivity { //written hint TODO:layout
+public class HintActivity extends AppCompatActivity { //written hint TODO:fill
 
     DatabaseHandler databaseHandler;
     Hint act_hint = Hint.getDefault();
@@ -16,8 +17,6 @@ public class HintActivity extends AppCompatActivity { //written hint TODO:layout
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        databaseHandler = DatabaseHandler.getInstance(this);
-
         //initialisation of Activity and Toolbar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hint);
@@ -27,14 +26,27 @@ public class HintActivity extends AppCompatActivity { //written hint TODO:layout
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-
-        //get hint with object of type EMPTY, PLACE*when there is no google maps integration to gos there
-        act_hint = databaseHandler.nextHint();
-        //act_hint = Hint.getDefault();
-        //System.out.println(act_hint);
         TextView hint = findViewById(R.id.hint);
-        hint.setText(act_hint.createText());
+        if(savedInstanceState!=null){
+            hint.setText(savedInstanceState.getString("act_hint_text"));
+        }
+        else{
+            databaseHandler = DatabaseHandler.getInstance(this);
+            //get hint with object of type EMPTY, PLACE*when there is no google maps integration to gos there
+            act_hint = databaseHandler.nextHint();
+            System.out.println(act_hint);
+            hint.setText(act_hint.createText());
+        }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("act_hint_text", act_hint.createText());
+        Log.i("onSaveInstanceState", "onSaveInstanceState()");
+    }
+
+    //back arrow
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         if (item.getItemId()==android.R.id.home){

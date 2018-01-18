@@ -26,12 +26,7 @@ public class YoutubePlayer extends YouTubeFailureRecoveryActivity{
 
         playerView = (YouTubePlayerView) findViewById(R.id.player);
         playerView.initialize(DEVELOPER_KEY, this);
-
-
-
     }
-
-
 
     @Override
     protected YouTubePlayer.Provider getYouTubePlayerProvider() {

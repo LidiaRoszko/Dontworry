@@ -57,6 +57,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_LINK = "link";
     private static final String KEY_POS = "position";
 
+    private ArrayList<Question> list;
 
 
 
@@ -217,6 +218,17 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     public int getNumberOfQuestions(){
         return countRows(TABLE_QUESTIONS);
 }
+
+    public Question searchQuestion(String text){
+        ArrayList<Question> list = this.list;
+
+        for(Question q : this.list){
+            if(text.equals(q.getText())){
+                return q;
+            }
+        };
+        return null;
+    }
 
     public Question nextQuestion() {
         /*

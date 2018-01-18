@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/common_google_signin_btn_text_dark_default"
-    tools:context="com.lila.dontworry.Main2Activity">
+    tools:context="com.lila.dontworry.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,6 +45,7 @@
             android:text="Don't worry"
             android:textColor="@color/darkgreen"
             android:textSize="30dp" />
+
     </android.support.v7.widget.Toolbar>
 
     <android.support.design.widget.BottomNavigationView

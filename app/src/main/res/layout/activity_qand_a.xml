@@ -63,6 +63,5 @@
             app:rotation_degrees="15.5"
             tools:context=".QandAActivity" />
 
-
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.lila.dontworry.Logic.WeatherSingleton;
 
-public class WeatherActivity extends AppCompatActivity { //TODO:layout
+public class WeatherActivity extends AppCompatActivity { //TODO:from DB
 
     private Context self = this;
     @Override
