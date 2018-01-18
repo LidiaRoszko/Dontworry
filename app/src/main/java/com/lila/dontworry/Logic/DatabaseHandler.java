@@ -35,6 +35,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String TABLE_PLACES = "places";
     private static final String TABLE_EVENTS = "events";
     private static final String TABLE_WEATHER = "weather";
+    private static final String TABLE_YOUTUBE = "youtube";
+
 
 
     // Table Columns names
@@ -56,6 +58,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_TITLE = "title";
     private static final String KEY_LINK = "link";
     private static final String KEY_POS = "position";
+
+    private static final String KEY_YT_ID = "youtube_id";
+    private static final String KEY_YT_URL = "youtube_url";
+
 
     private ArrayList<Question> list;
 
@@ -129,6 +135,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 + KEY_HINT_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
         db.execSQL(CREATE_HINT_OBJECTS_TABLE);
         */
+
+        String CREATE_YOUTUBE_TABLE = "CREATE TABLE " + TABLE_YOUTUBE + " (" + KEY_YT_ID + " INTEGER," + KEY_YT_URL + " TEXT, " + "PRIMARY KEY (" + KEY_YT_ID + "))";
+        db.execSQL(CREATE_YOUTUBE_TABLE);
+
     }
 
     // Upgrading database
@@ -144,6 +154,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLACES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENTS);
         //db.execSQL("DROP TABLE IF EXISTS " + TABLE_WEATHER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_YOUTUBE);
 
 
         // Create tables again
@@ -181,22 +192,60 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.close(); // Closing database connection
     }
 
+    private void addYoutubeLink(String link) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_YT_URL, link);
+
+        // Inserting Row
+        db.insert(TABLE_YOUTUBE, null, values);
+        db.close(); // Closing database connection
+    }
+
+    public String randomYoutubeLink() {
+        String link = "";
+
+        int linkCount = countRows(TABLE_YOUTUBE);
+        int randomId = ThreadLocalRandom.current().nextInt(1, linkCount + 1);
+
+        System.out.println(randomId);
+
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_YOUTUBE, null, KEY_YT_ID + " = ?",
+                new String[] { String.valueOf(randomId) }, null, null, null, null);
+
+
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                link = cursor.getString(1);
+            }
+            cursor.close();
+        }
+
+        db.close();
+
+        return link;
+
+    }
+
     public void resetDatabase() {
         wipeTables();
 
-        addQuestionHint("Did you enjoy your call with %s?", "Call %s.", false, true);
-        addQuestionHint("Did you enjoy to visit %s?", "Visit %s.", false, true);
-        addQuestionHint("Do you like to eat candy?", "Eat some candy.", false, false);
+        addQuestionHint("Do you like to eat candy?", "Eat some sweeties.", false, false);
         addQuestionHint("Do you like to drink?", "Go out and have a drink!", false, false);
         addQuestionHint("Did you sleep well?", "Go to bed 1 hour earlier today!", true, true);
         addQuestionHint("Did you do any sports today?", "Jump around 20 times!", true, true);
         addQuestionHint("Did you eat any fruits today?", "Eat a big banana!", true, true);
         addQuestionHint("Did you receive love today?", "Invite your beloved person!", true, true);
-        addQuestionHint("Did you see the sun today?", "#Bild der Sonne", true, true);
-        addQuestionHint("Did you have fun today?", "#Witz", true, true);
-        addQuestionHint("Have you been to cinema recently?", "#Kinoprogramm", true, true);
-        addQuestionHint("Do you like Italian food?", "#Italienische Restaurants", false, false);
         addQuestionHint("Have you called your grandma today?", "Call your grandma, she will be happy!", true, true);
+
+        addYoutubeLink("0Bmhjf0rKe8");
+        addYoutubeLink("7M-jsjLB20Y");
+        addYoutubeLink("dQ5BAupEKvw");
 
 
         /*

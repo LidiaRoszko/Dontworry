@@ -16,6 +16,7 @@ import java.util.Locale;
 
 public class WeatherAsync {
     private static final String OPEN_WEATHER_MAP_URL = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric";
+    private static final String OPEN_WEATHER_MAP_API = "193013abeb7b6cb6cd1ade70faa587db";
 
     private static boolean isSunny(int actualId, long sunrise, long sunset) { //a sunny or cloudy day during before sunset
         long currentTime = new Date().getTime();
