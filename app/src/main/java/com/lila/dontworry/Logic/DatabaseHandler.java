@@ -41,6 +41,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String TABLE_EVENTS = "events";
     private static final String TABLE_WEATHER = "weather";
     private static final String TABLE_YOUTUBE = "youtube";
+    private static final String TABLE_MOODS = "moods";
 
 
 
@@ -53,7 +54,6 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_HINT_ID = "hint_id";
     private static final String KEY_OBJECT_ID = "object_id";
     private static final String KEY_TYPE = "type";
-
     private static final String KEY_PLACE_ID = "place_id";
     private static final String KEY_LONG = "longitude";
     private static final String KEY_LAT = "latitude";
@@ -63,11 +63,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_TITLE = "title";
     private static final String KEY_LINK = "link";
     private static final String KEY_DATE_FETCH = "date_fetch";
-
-
     private static final String KEY_YT_ID = "youtube_id";
     private static final String KEY_YT_URL = "youtube_url";
-
+    private static final String KEY_MOOD_ID = "mood_id";
+    private static final String KEY_MOOD_VALUE = "mood_value";
+    private static final String KEY_MOOD_DATE = "mood_date";
 
     private ArrayList<Question> list;
     private static Map<String, ArrayList<Event>> tempEvents = new HashMap<>();
@@ -120,18 +120,19 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.execSQL(CREATE_OBJECTS_TABLE);
 
         String CREATE_QUESTION_OBJECTS_TABLE = "CREATE TABLE " + TABLE_QUESTION_OBJECTS + "("
-                + KEY_QUESTION_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_QUESTION_ID + ", " + KEY_OBJECT_ID + ")" + ")";
+                + KEY_QUESTION_ID + " INTEGER, " + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_QUESTION_ID + ", " + KEY_OBJECT_ID + ")" + ")";
         db.execSQL(CREATE_QUESTION_OBJECTS_TABLE);
 
         String CREATE_HINT_OBJECTS_TABLE = "CREATE TABLE " + TABLE_HINT_OBJECTS + "("
-                + KEY_HINT_ID + " INTEGER," + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
+                + KEY_HINT_ID + " INTEGER, " + KEY_OBJECT_ID + " INTEGER," + " PRIMARY KEY (" + KEY_HINT_ID + ", " + KEY_OBJECT_ID + ")" + ")";
         db.execSQL(CREATE_HINT_OBJECTS_TABLE);
 
         // ###
-
+        /*
         String CREATE_PLACES_TABLE = "CREATE TABLE " + TABLE_PLACES + "("
                 + KEY_PLACE_ID + " INTEGER," + KEY_LONG + " DOUBLE," + KEY_LAT + " DOUBLE," + " PRIMARY KEY (" + KEY_PLACE_ID + ")" + ")";
         db.execSQL(CREATE_PLACES_TABLE);
+        */
 
         String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + "("
                 + KEY_EVENT_ID + " INTEGER," + KEY_DATE + " TEXT," + KEY_PLACE + " TEXT," + KEY_TITLE + " TEXT," + KEY_LINK + " TEXT," +
@@ -147,6 +148,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         String CREATE_YOUTUBE_TABLE = "CREATE TABLE " + TABLE_YOUTUBE + " (" + KEY_YT_ID + " INTEGER," + KEY_YT_URL + " TEXT, " + "PRIMARY KEY (" + KEY_YT_ID + "))";
         db.execSQL(CREATE_YOUTUBE_TABLE);
+
+        String CREATE_MOODS_TABLE = "CREATE TABLE " + TABLE_MOODS + " (" + KEY_MOOD_ID + " INTEGER," + KEY_MOOD_VALUE + " INTEGER, " +
+                KEY_MOOD_DATE + " TEXT, " + "PRIMARY KEY (" + KEY_MOOD_ID + "))";
+        db.execSQL(CREATE_MOODS_TABLE);
 
     }
 
@@ -164,6 +169,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENTS);
         //db.execSQL("DROP TABLE IF EXISTS " + TABLE_WEATHER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_YOUTUBE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MOODS);
 
 
         // Create tables again
@@ -322,6 +328,103 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         return link;
 
     }
+
+    private int moodToInt(Mood mood) {
+        switch (mood) {
+            case VERY_BAD:
+                return 0;
+            case BAD:
+                return 1;
+            case MODERATE:
+                return 2;
+            case GOOD:
+                return 3;
+            case VERY_GOOD:
+                return 4;
+        }
+        return 0;
+    }
+
+    private Mood intToMood(int value) {
+        switch (value) {
+            case 0:
+                return Mood.VERY_BAD;
+            case 1:
+                return Mood.BAD;
+            case 2:
+                return Mood.MODERATE;
+            case 3:
+                return Mood.GOOD;
+            case 4:
+                return Mood.VERY_GOOD;
+        }
+        return Mood.VERY_BAD;
+    }
+
+    public void addMood(Mood mood, String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_MOOD_VALUE, moodToInt(mood));
+        values.put(KEY_MOOD_DATE, date);
+
+        db.insert(TABLE_MOODS, null, values);
+
+        db.close();
+    }
+
+    public ArrayList<Mood> getMoodList() {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        ArrayList<Mood> moodArrayList = new ArrayList<>();
+        String[] columns = {KEY_MOOD_VALUE};
+
+        Cursor cursor = db.query(TABLE_MOODS, columns, null,
+                null, null, null, null, null);
+
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast())
+                {
+                    int mood = cursor.getInt(0);
+                    moodArrayList.add(intToMood(mood));
+                    cursor.moveToNext();
+                }
+                cursor.close();
+            }
+        }
+        db.close();
+
+        return moodArrayList;
+    }
+
+    public ArrayList<String> getMoodDateList() {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        ArrayList<String> moodArrayList = new ArrayList<>();
+        String[] columns = {KEY_MOOD_DATE};
+
+        Cursor cursor = db.query(TABLE_MOODS, columns, null,
+                null, null, null, null, null);
+
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast())
+                {
+                    String mood = cursor.getString(0);
+                    moodArrayList.add(mood);
+                    cursor.moveToNext();
+                }
+                cursor.close();
+            }
+        }
+        db.close();
+
+        return moodArrayList;
+    }
+
 
     public void resetDatabase() {
         wipeTables();

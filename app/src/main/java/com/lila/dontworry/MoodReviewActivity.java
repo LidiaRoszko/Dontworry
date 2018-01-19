@@ -11,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+
+import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Mood;
 import com.lila.dontworry.Logic.MoodSingleton;
 import com.lila.dontworry.Logic.Question;
@@ -18,6 +20,7 @@ import com.lila.dontworry.Logic.Question;
 public class MoodReviewActivity extends AppCompatActivity {
     final Context context = this;
     private MoodSingleton moodSingleton;
+    static Mood tempMood = Mood.VERY_BAD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,8 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                moodSingleton.put(Mood.BAD);
+                tempMood = Mood.BAD;
+                //moodSingleton.put(Mood.BAD);
                 startActivity(intent);
             }
         });
@@ -50,7 +54,8 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                moodSingleton.put(Mood.GOOD);
+                tempMood = Mood.GOOD;
+                //moodSingleton.put(Mood.GOOD);
                 startActivity(intent);
             }
         });
@@ -58,7 +63,8 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                moodSingleton.put(Mood.MODERATE);
+                tempMood = Mood.MODERATE;
+//                moodSingleton.put(Mood.MODERATE);
                 startActivity(intent);
             }
         });
@@ -66,7 +72,8 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodvg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                moodSingleton.put(Mood.VERY_GOOD);
+                tempMood = Mood.VERY_GOOD;
+//                moodSingleton.put(Mood.VERY_GOOD);
                 startActivity(intent);
             }
         });
@@ -74,7 +81,8 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodvb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                moodSingleton.put(Mood.VERY_BAD);
+                tempMood = Mood.VERY_BAD;
+//                moodSingleton.put(Mood.VERY_BAD);
                 startActivity(intent);
             }
         });

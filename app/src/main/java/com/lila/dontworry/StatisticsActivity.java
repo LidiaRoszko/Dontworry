@@ -18,6 +18,8 @@ import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.lila.dontworry.Logic.DatabaseHandler;
+import com.lila.dontworry.Logic.EventAsync;
 import com.lila.dontworry.Logic.Mood;
 
 import java.text.NumberFormat;
@@ -38,14 +40,22 @@ public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABAS
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        DatabaseHandler databaseHandler = DatabaseHandler.getInstance(this);
+        databaseHandler.addMood(MoodReviewActivity.tempMood, EventAsync.getDate(0));
 
         //if landscape then graph
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+           /*
             moods = new ArrayList<>();
             moods = getMoods(true);
 
             dates = new ArrayList<>();
             dates = getDates(true);
+*/
+           moods = databaseHandler.getMoodList();
+           dates = databaseHandler.getMoodDateList();
+
+
 
             int n = dates.size();
 
@@ -142,11 +152,16 @@ public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABAS
             TextView moodDay3 = findViewById(R.id.moodDay3);
             TextView moodDay4 = findViewById(R.id.moodDay4);
 
+            /*
             moods = new ArrayList<>();
             moods = getMoods(false);
 
             dates = new ArrayList<>();
             dates = getDates(false);
+*/
+            moods = databaseHandler.getMoodList();
+            dates = databaseHandler.getMoodDateList();
+
 
             switch (dates.size()) {
                 case 4:
@@ -166,6 +181,10 @@ public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABAS
                     break;
             }
         }
+
+        System.out.println(moods);
+        System.out.println(dates);
+
     }
 
     private ArrayList<String> getDates(Boolean ifAll) { //TODO: from DB
