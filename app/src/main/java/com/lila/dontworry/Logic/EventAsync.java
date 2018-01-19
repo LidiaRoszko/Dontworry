@@ -30,9 +30,11 @@ public class EventAsync extends AsyncTask<URL, Integer, Long> {
     protected Long doInBackground(URL... urls) {
         // check in DB which days have already events and return List with days which not have (to have +3 days)
 
+
         if (urls.length < 1) {
             return null;
         }
+
 
 
         int cachedDays = 3;

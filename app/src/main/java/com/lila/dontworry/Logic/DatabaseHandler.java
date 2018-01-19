@@ -90,7 +90,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
 
-        resetDatabase();
+        //resetDatabase();
 
     }
 
@@ -150,7 +150,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.execSQL(CREATE_YOUTUBE_TABLE);
 
         String CREATE_MOODS_TABLE = "CREATE TABLE " + TABLE_MOODS + " (" + KEY_MOOD_ID + " INTEGER," + KEY_MOOD_VALUE + " INTEGER, " +
-                KEY_MOOD_DATE + " TEXT, " + "PRIMARY KEY (" + KEY_MOOD_ID + "))";
+                KEY_MOOD_DATE + " TEXT, " + "PRIMARY KEY (" + KEY_MOOD_ID + "), UNIQUE( " + KEY_MOOD_DATE + "))";
         db.execSQL(CREATE_MOODS_TABLE);
 
     }

@@ -2,6 +2,7 @@ package com.lila.dontworry;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -22,6 +23,7 @@ import com.lila.dontworry.Logic.WeatherAsync;
 import com.lila.dontworry.Logic.Localisation;
 import com.lila.dontworry.Logic.EventSingleton;
 import com.lila.dontworry.Logic.WeatherSingleton;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -64,14 +66,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void getEvents() throws IOException { //TODO: FROM DATABASE, CHECK IF THERE ARE FOR NEXT 2 DAYS(when wifi avaiilable), when phone internet and no for this day then has to be downloaded in another case nothing
 
-        if (EventSingleton.getMap()==null) {
-            new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/"));
-        }
+        if (Utility.getConnectionType(this) == Utility.TYPE_DISCONNECTED)
+            return;
+        new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/"));
+
     }
 
     private void getWeather() throws MalformedURLException { // www.androstock.com - getting the weather TODO:FROM DATABASE, if Location changed then new request, if 3 hours old then new request (with wifi and with normal internet)
 
-        if(!WeatherSingleton.exist()) {
+        if (Utility.getConnectionType(this) == Utility.TYPE_DISCONNECTED)
+            return;
+
+        if (!WeatherSingleton.exist()) {
             WeatherAsync.placeIdTask asyncTask = new WeatherAsync.placeIdTask(new WeatherAsync.AsyncResponse() {
                 public void processFinish(Boolean isSunny, Boolean isSnow, String weather_city, String weather_description, String weather_temperature, String weather_humidity, String weather_pressure) {
                     Weather w = new Weather(isSunny, isSnow, weather_city, weather_description, weather_temperature, weather_humidity, weather_pressure);
@@ -95,39 +101,38 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View arg0) {
-               Random randomGenerator = new Random();
+                Random randomGenerator = new Random();
                 int number = randomGenerator.nextInt(5);
-                if(number==1) {
-                    if(WeatherSingleton.exist()){
-                    if(WeatherSingleton.getWeather().getIsSunny()|| WeatherSingleton.getWeather().getIsSnow()){
-                        Intent i1 = new Intent(context, WeatherActivity.class);
-                        startActivity(i1);
+                if (number == 4 && Utility.getConnectionType(context) != ConnectivityManager.TYPE_WIFI)
+                    number = 3;
+
+                if (number == 1) {
+                    if (WeatherSingleton.exist()) {
+                        if (WeatherSingleton.getWeather().getIsSunny() || WeatherSingleton.getWeather().getIsSnow()) {
+                            Intent i1 = new Intent(context, WeatherActivity.class);
+                            startActivity(i1);
+                        } else {
+                            Intent intent11 = new Intent(context, WeatherActivity.class);
+                            startActivity(intent11);
+                        }
                     }
-                    else{
-                        Intent intent11 = new Intent(context, WeatherActivity.class);
-                        startActivity(intent11);
-                    }
-                }
                 }
                 //else if(number==2 && EventSingleton.getMap()!=null){
-                else if(number==2 && DatabaseHandler.eventsFetched){
+                else if (number == 2 && DatabaseHandler.eventsFetched) {
                     Intent intent2 = new Intent(context, EventActivity.class);
                     startActivity(intent2);
                 }
                 //else if(number==2 && EventSingleton.getMap()==null){
-                else if(number==2 && !DatabaseHandler.eventsFetched){
+                else if (number == 2 && !DatabaseHandler.eventsFetched) {
                     Intent intent2 = new Intent(context, HintActivity.class);
                     startActivity(intent2);
-                }
-                else if(number==3){
+                } else if (number == 3) {
                     Intent intent2 = new Intent(context, HintActivity.class);
                     startActivity(intent2);
-                }
-                else if(number==4){
+                } else if (number == 4) {
                     Intent intent2 = new Intent(context, YoutubePlayer.class);
                     startActivity(intent2);
-                }
-                else{
+                } else {
                     Intent intent3 = new Intent(context, PhoneActivity.class);
                     startActivity(intent3);
                 }
@@ -137,20 +142,21 @@ public class MainActivity extends AppCompatActivity {
 
     //create a menu
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
+
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch(item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.setLocation:
                 Intent intent = new Intent(this, MapsActivity.class);
                 startActivity(intent);
                 return true;
         }
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.help:
                 Intent intent = new Intent(this, HelpActivity.class);
                 startActivity(intent);
@@ -168,10 +174,9 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.statistics:
                     Intent i1;
-                    if(true){ //TODO: check in DB if the mood review was done, when not then to mood review activity in another cas to statistics
+                    if (true) { //TODO: check in DB if the mood review was done, when not then to mood review activity in another cas to statistics
                         i1 = new Intent(context, MoodReviewActivity.class);
-                    }
-                    else{
+                    } else {
                         i1 = new Intent(context, StatisticsActivity.class);
                     }
                     i1.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

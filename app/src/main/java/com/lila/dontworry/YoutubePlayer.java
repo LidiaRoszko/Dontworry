@@ -1,6 +1,7 @@
 package com.lila.dontworry;
 //https://developers.google.com/youtube/android/player/
 
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 
 import com.google.android.youtube.player.YouTubePlayer;
@@ -13,13 +14,14 @@ public class YoutubePlayer extends YouTubeFailureRecoveryActivity{
     private YouTubePlayerView playerView;
     private String youtube_url;
 
-    String DEVELOPER_KEY = "193013abeb7b6cb6cd1ade70faa587db";
+    String DEVELOPER_KEY = "";
 
 
 
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+
         setContentView(R.layout.activity_youtube);
 
         // The unique video id of the youtube video (can be obtained from video url)
@@ -28,6 +30,10 @@ public class YoutubePlayer extends YouTubeFailureRecoveryActivity{
 
         System.out.println(youtube_url);
 
+        if (Utility.getConnectionType(this) != ConnectivityManager.TYPE_WIFI){
+            finish();
+            return;
+        }
         playerView = (YouTubePlayerView) findViewById(R.id.player);
         playerView.initialize(DEVELOPER_KEY, this);
     }

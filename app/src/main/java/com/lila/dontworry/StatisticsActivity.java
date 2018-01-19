@@ -41,7 +41,7 @@ public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABAS
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         DatabaseHandler databaseHandler = DatabaseHandler.getInstance(this);
-        databaseHandler.addMood(MoodReviewActivity.tempMood, EventAsync.getDate(0));
+        //databaseHandler.addMood(MoodReviewActivity.tempMood, EventAsync.getDate(0));
 
         //if landscape then graph
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
