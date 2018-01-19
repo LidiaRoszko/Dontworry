@@ -24,7 +24,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.lila.dontworry.Logic.CustomAdapter;
+import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Event;
+import com.lila.dontworry.Logic.EventAsync;
 import com.lila.dontworry.Logic.Localisation;
 import com.lila.dontworry.Logic.EventSingleton;
 import java.io.IOException;
@@ -56,7 +58,9 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         //TODO: DATABASE getEvents(today);
         Calendar c = Calendar.getInstance();
         c.setTime(new Date()); // as key to get the right list
-        this.list = EventSingleton.getList();
+        //this.list = EventSingleton.getList();
+        Calendar calendar = Calendar.getInstance();
+        this.list = DatabaseHandler.getInstance(this).getEventList(EventAsync.getDate(0));
 
         // if landscape orientation and wifi then launching a fragment with a map
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Wifi.isConnected()){
@@ -79,8 +83,8 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("Clicked -- " + list.get(position).getLink());
                 Uri uriUrl = Uri.parse(list.get(position).getLink());
                 view.setSelected(true);
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW,

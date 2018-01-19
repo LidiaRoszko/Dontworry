@@ -23,6 +23,7 @@ public class EventSingleton {
                 l = null;
             }
             map.put(c, events);
+            System.out.println(map);
             cal = c;
             if(l==null){
             l = events;}
