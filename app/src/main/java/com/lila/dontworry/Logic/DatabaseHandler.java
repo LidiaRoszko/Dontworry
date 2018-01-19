@@ -5,7 +5,12 @@ package com.lila.dontworry.Logic;
  */
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import android.content.ContentUris;
@@ -57,13 +62,16 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     private static final String KEY_PLACE = "place";
     private static final String KEY_TITLE = "title";
     private static final String KEY_LINK = "link";
-    private static final String KEY_POS = "position";
+    private static final String KEY_DATE_FETCH = "date_fetch";
+
 
     private static final String KEY_YT_ID = "youtube_id";
     private static final String KEY_YT_URL = "youtube_url";
 
 
     private ArrayList<Question> list;
+    private static Map<String, ArrayList<Event>> tempEvents = new HashMap<>();
+    public static boolean eventsFetched = false;
 
 
 
@@ -126,7 +134,8 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         db.execSQL(CREATE_PLACES_TABLE);
 
         String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + "("
-                + KEY_EVENT_ID + " INTEGER," + KEY_DATE + " TEXT," + KEY_PLACE + " TEXT," + KEY_TITLE + " TEXT," + KEY_LINK + " TEXT," + KEY_POS + " INTEGER, " + " PRIMARY KEY (" + KEY_EVENT_ID + ")" + ")";
+                + KEY_EVENT_ID + " INTEGER," + KEY_DATE + " TEXT," + KEY_PLACE + " TEXT," + KEY_TITLE + " TEXT," + KEY_LINK + " TEXT," +
+                KEY_DATE_FETCH + " TEXT, " + " PRIMARY KEY (" + KEY_EVENT_ID + ")" + " UNIQUE ( " + KEY_DATE + ", " + KEY_PLACE + ", " + KEY_TITLE + ")" + ")";
         db.execSQL(CREATE_EVENTS_TABLE);
 
 
@@ -201,6 +210,88 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         // Inserting Row
         db.insert(TABLE_YOUTUBE, null, values);
         db.close(); // Closing database connection
+    }
+
+    private void addEvent(Event event, String dateFetched) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_DATE, event.getDate());
+        values.put(KEY_PLACE, event.getPlace());
+        values.put(KEY_TITLE, event.getTitle());
+        values.put(KEY_LINK, event.getLink());
+        values.put(KEY_DATE_FETCH, dateFetched);
+
+        System.out.println(event.getDate() + " " + event.getPlace() + " " + event.getTitle() + " " + event.getLink());
+
+        // Inserting Row
+        db.insert(TABLE_EVENTS, null, values);
+        db.close(); // Closing database connection
+    }
+
+    public static void addEventList(ArrayList<Event> eventArrayList, String dateFetch) {
+        //eventsFetched = eventsFetched || !tempEvents.isEmpty();
+        tempEvents.put(dateFetch, eventArrayList);
+        eventsFetched = true;
+    }
+
+    private void _addEventList() {
+        removeOldEvents();
+        for (String fetchDate : tempEvents.keySet()) {
+            for (Event event : tempEvents.get(fetchDate)) {
+                addEvent(event, fetchDate);
+            }
+        }
+        tempEvents.clear();
+    }
+
+    public ArrayList<Event> getEventList(String fetchDate) {
+        _addEventList();
+
+        ArrayList<Event> eventArrayList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_EVENTS, null, KEY_DATE_FETCH + " = ?",
+                new String[] { String.valueOf(fetchDate) }, null, null, null, null);
+
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast())
+                {
+                    String date = cursor.getString(1);
+                    String place = cursor.getString(2);
+                    String title = cursor.getString(3);
+                    String link = cursor.getString(4);
+                    eventArrayList.add(new Event(date, place, title, link));
+                    cursor.moveToNext();
+                }
+                cursor.close();
+            }
+        }
+        db.close();
+
+        return eventArrayList;
+    }
+
+    private void removeOldEvents() {
+/*
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] whereArgs = {KEY_DATE_FETCH, EventAsync.getDate(0), KEY_DATE_FETCH, EventAsync.getDate(1), KEY_DATE_FETCH, EventAsync.getDate(2)};
+        db.delete(TABLE_EVENTS, "? != ? AND ? != ? AND ? != ?", whereArgs);
+
+        db.close();
+ */
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        db.delete(TABLE_EVENTS, KEY_DATE_FETCH + " != " + EventAsync.getDate(0) + " AND " +
+                KEY_DATE_FETCH + " != " + EventAsync.getDate(1) + " AND " +
+                KEY_DATE_FETCH + " != " + EventAsync.getDate(2), null);
+
+        db.close();
+
     }
 
     public String randomYoutubeLink() {

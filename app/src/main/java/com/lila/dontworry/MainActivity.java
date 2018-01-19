@@ -11,6 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+
+import com.lila.dontworry.Logic.DatabaseHandler;
+import com.lila.dontworry.Logic.Event;
 import com.lila.dontworry.Logic.EventAsync;
 import com.lila.dontworry.Logic.MoodSingleton;
 import com.lila.dontworry.Logic.Utility;
@@ -22,6 +25,12 @@ import com.lila.dontworry.Logic.WeatherSingleton;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.EventListener;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,8 +63,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getEvents() throws IOException { //TODO: FROM DATABASE, CHECK IF THERE ARE FOR NEXT 2 DAYS(when wifi avaiilable), when phone internet and no for this day then has to be downloaded in another case nothing
-    if (EventSingleton.getMap()==null) {
-        new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/"));
+
+        if (EventSingleton.getMap()==null) {
+            new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/"));
         }
     }
 
@@ -68,9 +78,11 @@ public class MainActivity extends AppCompatActivity {
                     WeatherSingleton.getInstance(w);
                 }
             });
+            /*
             asyncTask.execute(String.valueOf(Localisation.getL1()), String.valueOf(Localisation.getL2())); //  asyncTask.execute("Latitude", "Longitude")
             if (Utility.getConnectionType(this) != Utility.TYPE_DISCONNECTED)
                 new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/"));
+                */
         }
     }
 
@@ -97,11 +109,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 }
-                else if(number==2 && EventSingleton.getMap()!=null){
+                //else if(number==2 && EventSingleton.getMap()!=null){
+                else if(number==2 && DatabaseHandler.eventsFetched){
                     Intent intent2 = new Intent(context, EventActivity.class);
                     startActivity(intent2);
                 }
-                else if(number==2 && EventSingleton.getMap()==null){
+                //else if(number==2 && EventSingleton.getMap()==null){
+                else if(number==2 && !DatabaseHandler.eventsFetched){
                     Intent intent2 = new Intent(context, HintActivity.class);
                     startActivity(intent2);
                 }

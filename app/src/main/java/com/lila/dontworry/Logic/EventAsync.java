@@ -30,71 +30,20 @@ public class EventAsync extends AsyncTask<URL, Integer, Long> {
     protected Long doInBackground(URL... urls) {
         // check in DB which days have already events and return List with days which not have (to have +3 days)
 
-            ArrayList<Calendar> results = new ArrayList<>();
-            boolean d2 = false;
-            boolean d1 = false;
-            boolean d0 = false;
-            Set<Calendar> set = null;
-            int flag = 1;
-            try{set = EventSingleton.getMap().keySet();}
-            catch(NullPointerException e){
-                flag = 0;
-            }   Calendar now = Calendar.getInstance();
-
-            if(flag==1) {
-
-
-                for (Calendar c : set) {
-                    now.setTime(new Date());
-                    if (c.before(now)) {
-                        //delete from DB
-                    } else {
-                        if (c.compareTo(now) == 0) {
-                            d0 = true;
-                            break;
-                        }
-                        now.add(Calendar.DAY_OF_MONTH, 1);
-                        if (c.compareTo(now) == 0) {
-                            d1 = true;
-                        }
-
-                        now.add(Calendar.DAY_OF_MONTH, 1);
-                        if (c.compareTo(now) == 0) {
-                            d2 = true;
-                        }
-                    }
-                }
-            }
-                if (!d0) {
-                    now.setTime(new Date());
-                    results.add(now);
-                }
-               /* if (!d1) {
-                    now.setTime(new Date());
-                    now.add(Calendar.DAY_OF_MONTH, 1);
-                    results.add(now);
-                }
-                if (!d2) {
-                    now.setTime(new Date());
-                    now.add(Calendar.DAY_OF_MONTH, 2);
-                    results.add(now);}*/
-
-                this.days = results;
-
-
         if (urls.length < 1) {
             return null;
         }
-        int daysSize = 0;
-        if(this.days!=null) {
-            daysSize = this.days.size();
-        }
-        for (int i = 0; i < daysSize; i++) { // TODO: for 3 days
+
+
+        int cachedDays = 3;
+        for (int i = 0; i < cachedDays; i++) { // TODO: for 3 days
+
+            System.out.println("FETCH EVENTS " + getDate(i));
             this.list = new ArrayList();
 
             URL url = null;
             try {
-                url = new URL(urls[0].toString() + changeToUrlEnd((Calendar) days.get(i)));
+                url = new URL(urls[0].toString() + getDate(i));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -136,7 +85,8 @@ public class EventAsync extends AsyncTask<URL, Integer, Long> {
 
                     }
                     if (this.list.size() > 0) {
-                        EventSingleton.getInstance(this.list, (Calendar) days.get(i));
+                        //EventSingleton.getInstance(this.list, (Calendar) days.get(i));
+                        DatabaseHandler.addEventList(this.list, getDate(i));
                     }
                 }
             } catch (IOException e) {
@@ -146,68 +96,18 @@ public class EventAsync extends AsyncTask<URL, Integer, Long> {
         return null;
     }
 
-    private String changeToUrlEnd(Calendar c) {
-        int month = c.get(Calendar.MONTH)+1;
+    public static String getDate(int dayOffset) {
+        Calendar c = Calendar.getInstance();
+        int month = c.get(Calendar.MONTH) + 1;
         String monthString = String.valueOf(month);
-        if(month<10){
+        if (month < 10) {
             monthString = "0" + monthString;
         }
-        int day = c.get(Calendar.DAY_OF_MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH) + dayOffset;
         String dayString = String.valueOf(day);
-        if(day<10){
+        if (day < 10) {
             dayString = "0" + dayString;
         }
         return c.get(Calendar.YEAR) + "-" + monthString + "-" + dayString;
     }
-
-    private void checkDays() {
-        // check in DB which days have already events and return List with days which not have (to have +3 days)
-        if (EventSingleton.getMap() != null) {
-            ArrayList<Calendar> results = new ArrayList<>();
-            boolean d2 = false;
-            boolean d1 = false;
-            boolean d0 = false;
-            Set<Calendar> set = null;
-            try{set = EventSingleton.getMap().keySet();}
-            catch(NullPointerException e){}
-            Calendar now = Calendar.getInstance();
-
-            for (Calendar c : set) {
-                now.setTime(new Date());
-                if (c.before(now)) {
-                    //delete from DB
-                } else {
-                    if (c.compareTo(now) == 0) {
-                        d0 = true;
-                        break;
-                    }
-                    now.add(Calendar.DAY_OF_MONTH, 1);
-                    if (c.compareTo(now) == 0) {
-                        d1 = true;
-                    }
-
-                    now.add(Calendar.DAY_OF_MONTH, 1);
-                    if (c.compareTo(now) == 0) {
-                        d2 = true;
-                    }
-                }
-            }
-            if (!d0) {
-                now.setTime(new Date());
-                results.add(now);
-            }
-            if (!d1) {
-                now.setTime(new Date());
-                now.add(Calendar.DAY_OF_MONTH, 1);
-                results.add(now);
-            }
-            if (!d2) {
-                now.setTime(new Date());
-                now.add(Calendar.DAY_OF_MONTH, 2);
-                results.add(now);
-            }
-            this.days = results;
-        }
-    }
-
 }
