@@ -90,7 +90,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
 
-        //resetDatabase();
+        resetDatabase();
 
     }
 
