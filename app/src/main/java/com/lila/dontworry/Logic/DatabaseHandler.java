@@ -488,6 +488,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                 null, null, null, "ABS("+ KEY_ANSWER + ")", null);
 
         Question question = Question.getDefault();
+        ArrayList<Question> questions = new ArrayList<>();
         if (cursorQuest != null) {
             if (cursorQuest.getCount() > 0) {
                 cursorQuest.moveToFirst();
@@ -502,7 +503,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                     question.setPermanent(q_permanent);
                     System.out.println(question.toString());
                     if ((!question.isPermanent() && question.getAnswer() == 0) || question.isPermanent())
-                        break;
+                        questions.add(question);
                     cursorQuest.moveToNext();
                 }
                 cursorQuest.close();
@@ -512,7 +513,10 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
 
         db.close();
 
-        return question;
+        int randomHintIndex = ThreadLocalRandom.current().nextInt(0, questions.size());
+        //System.out.println("hint " + randomHintIndex);
+
+        return questions.get(randomHintIndex);
     }
 
     public Hint nextHint() {
