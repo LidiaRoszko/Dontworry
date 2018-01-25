@@ -16,9 +16,9 @@ import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.EventAsync;
 import com.lila.dontworry.Logic.Localisation;
 import com.lila.dontworry.Logic.Utility;
-import com.lila.dontworry.Logic.Weather;
 import com.lila.dontworry.Logic.WeatherAsync;
 import com.lila.dontworry.Logic.WeatherSingleton;
+import org.json.JSONException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -43,21 +43,12 @@ public class MainActivity extends AppCompatActivity {
         addListenerOnButton();
 
         try {
-            getEvents();
+            getWeather();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        try {
-            getWeather();
-        } catch (MalformedURLException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();  // Always call the superclass method first
 
         try {
             getEvents();
@@ -65,11 +56,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        try {
-            getWeather();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
     }
 
     private void getEvents() throws IOException {
@@ -84,21 +70,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void getWeather() throws MalformedURLException { // www.androstock.com - getting the weather
+    private void getWeather() throws IOException, JSONException { // www.androstock.com - getting the weather
 
         if (Utility.getConnectionType(this) == Utility.TYPE_DISCONNECTED)
             return;
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.HOUR_OF_DAY, -3); // minus 3 hours
-        if (!WeatherSingleton.exist() || Localisation.isChange() || WeatherSingleton.getWeather().getDate().after(cal.getTime())) {
+        if (!WeatherSingleton.exist() || Localisation.isChange()) {
             Localisation.setChange(false);
-            WeatherAsync.placeIdTask asyncTask = new WeatherAsync.placeIdTask(new WeatherAsync.AsyncResponse() {
-                public void processFinish(Boolean isSunny, Boolean isSnow, String weather_city, String weather_description, String weather_temperature, String weather_humidity, String weather_pressure) {
-                    Weather w = new Weather(isSunny, isSnow, weather_city, weather_description, weather_temperature, weather_humidity, weather_pressure);
-                    WeatherSingleton.getInstance(w);
-                }
-            });
+            String OPEN_WEATHER_MAP_URL = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric";
+            String lat = String.valueOf(Localisation.getL1());
+            String lon = String.valueOf(Localisation.getL2());
+            URL url = new URL(String.format(OPEN_WEATHER_MAP_URL, lat, lon));
+            new WeatherAsync().execute(url);
         }
     }
 
@@ -114,16 +96,29 @@ public class MainActivity extends AppCompatActivity {
                 int number = randomGenerator.nextInt(5);
                 if (number == 4 && Utility.getConnectionType(context) != ConnectivityManager.TYPE_WIFI)
                     number = 3;
-
                 if (number == 1) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(new Date());
+                    cal.add(Calendar.HOUR_OF_DAY, -3); // minus 3 hours
                     if (WeatherSingleton.exist()) {
-                        if (WeatherSingleton.getWeather().getIsSunny() || WeatherSingleton.getWeather().getIsSnow()) {
+
+                        if(Localisation.isChange() || WeatherSingleton.getWeather().getDate().before(cal.getTime())){
+                            try {
+                                number = 5;
+                                getWeather();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        else {
                             Intent i1 = new Intent(context, WeatherActivity.class);
                             startActivity(i1);
-                        } else {
-                            Intent intent11 = new Intent(context, WeatherActivity.class);
-                            startActivity(intent11);
                         }
+                    }
+                    else{
+                        number = 5;
                     }
                 }
                 //else if(number==2 && EventSingleton.getMap()!=null){

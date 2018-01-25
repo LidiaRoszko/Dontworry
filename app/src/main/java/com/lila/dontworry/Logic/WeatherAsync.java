@@ -1,12 +1,11 @@
 package com.lila.dontworry.Logic;
-// www.androstock.com
-//get weather
 
 import android.os.AsyncTask;
-import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -14,8 +13,52 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class WeatherAsync {
-    private static final String OPEN_WEATHER_MAP_URL = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric";
+/**
+ * Created by Lidia on 25.01.2018.
+ */
+
+public class WeatherAsync extends AsyncTask<URL, Integer, JSONObject> {
+
+    @Override
+    protected JSONObject doInBackground(URL... urls) {
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) urls[0].openConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        connection.addRequestProperty("x-api-key", "3cb");
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        StringBuffer json = new StringBuffer(1024);
+        String tmp = "";
+        try {
+            while ((tmp = reader.readLine()) != null)
+                json.append(tmp).append("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            JSONObject data = new JSONObject(json.toString());
+            onPostExecute(data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     private static boolean isSunny(int actualId, long sunrise, long sunset) { //a sunny or cloudy day during before sunset
         long currentTime = new Date().getTime();
@@ -34,86 +77,30 @@ public class WeatherAsync {
             if(actualId==602||actualId==601||actualId==600){
                 return true;
             }
-             return false;
+            return false;
         }
         return false;
     }
 
-    public interface AsyncResponse {
-        void processFinish(Boolean bool1, Boolean bool2, String output1, String output2, String output3, String output4, String output5);
-    }
-
-    public static class placeIdTask extends AsyncTask<String, Void, JSONObject> {
-
-        public AsyncResponse delegate = null;//Call back interface
-
-        public placeIdTask(AsyncResponse asyncResponse) {
-            delegate = asyncResponse;//Assigning call back interfacethrough constructor
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... params) {
-
-            JSONObject jsonWeather = null;
-            try {
-                jsonWeather = getWeatherJSON(params[0], params[1]);
-            } catch (Exception e) {
-                Log.d("Error", "Cannot process JSON results", e);
-            }
-            return jsonWeather;
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject json) {
-            try {
-                if(json != null){
-                    JSONObject details = json.getJSONArray("weather").getJSONObject(0);
-                    JSONObject main = json.getJSONObject("main");
-                    DateFormat df = DateFormat.getDateTimeInstance();
-
-                    String city = json.getString("name");
-                    String description = details.getString("description").toUpperCase(Locale.US);
-                    String temperature = String.format("%.2f", main.getDouble("temp"))+ "°C";
-                    String humidity = main.getString("humidity") + "%";
-                    String pressure = main.getString("pressure") + " hPa";
-                    Boolean isSunny = isSunny(details.getInt("id"), json.getJSONObject("sys").getLong("sunrise") * 1000, json.getJSONObject("sys").getLong("sunset") * 1000);
-                    Boolean isSnow = isSnow(details.getInt("id"), json.getJSONObject("sys").getLong("sunrise") * 1000, json.getJSONObject("sys").getLong("sunset") * 1000);
-
-                    delegate.processFinish(isSunny, isSnow, city, description, temperature, "Humidity: " + humidity, pressure);
-                }
-            } catch (JSONException e) {
-                //Log.e(LOG_TAG, "Cannot process JSON results", e);
-            }
-        }
-    }
-
-    public static JSONObject getWeatherJSON(String lat, String lon){
+    protected void onPostExecute(JSONObject json) {
         try {
-            URL url = new URL(String.format(OPEN_WEATHER_MAP_URL, lat, lon));
-            HttpURLConnection connection =
-                    (HttpURLConnection)url.openConnection();
+            if(json != null){
+                JSONObject details = json.getJSONArray("weather").getJSONObject(0);
+                JSONObject main = json.getJSONObject("main");
+                DateFormat df = DateFormat.getDateTimeInstance();
 
-            connection.addRequestProperty("x-api-key", OPEN_WEATHER_MAP_API);
+                String city = json.getString("name");
+                String description = details.getString("description").toUpperCase(Locale.US);
+                String temperature = String.format("%.2f", main.getDouble("temp"))+ "°C";
+                String humidity = main.getString("humidity") + "%";
+                String pressure = main.getString("pressure") + " hPa";
+                Boolean isSunny = isSunny(details.getInt("id"), json.getJSONObject("sys").getLong("sunrise") * 1000, json.getJSONObject("sys").getLong("sunset") * 1000);
+                Boolean isSnow = isSnow(details.getInt("id"), json.getJSONObject("sys").getLong("sunrise") * 1000, json.getJSONObject("sys").getLong("sunset") * 1000);
 
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-
-            StringBuffer json = new StringBuffer(1024);
-            String tmp="";
-            while((tmp=reader.readLine())!=null)
-                json.append(tmp).append("\n");
-            reader.close();
-
-            JSONObject data = new JSONObject(json.toString());
-
-            // This value will be 404 if the request was not
-            // successful
-            if(data.getInt("cod") != 200){
-                return null;
+                WeatherSingleton.getInstance(new Weather(isSunny, isSnow, city, description, temperature, "Humidity: " + humidity, pressure));
             }
-            return data;
-        }catch(Exception e){
-            return null;
+        } catch (JSONException e) {
+            //Log.e(LOG_TAG, "Cannot process JSON results", e);
         }
     }
 }
