@@ -38,6 +38,7 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
 
     final Context context = this;
+    public static int connectionType = Utility.TYPE_DISCONNECTED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (Utility.getConnectionType(this) == Utility.TYPE_DISCONNECTED)
             return;
+        connectionType = Utility.getConnectionType(this);
         new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/"));
 
     }
