@@ -28,14 +28,13 @@ import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Event;
 import com.lila.dontworry.Logic.EventAsync;
 import com.lila.dontworry.Logic.Localisation;
-import com.lila.dontworry.Logic.EventSingleton;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class EventActivity extends AppCompatActivity implements OnMapReadyCallback { //TODO: change orientation fixing bug
+public class EventActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     ListView listView;
     OnMapReadyCallback context = this;
@@ -51,11 +50,9 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        ////TODO: CONNECTIVITY CHECK
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo Wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-        //TODO: DATABASE getEvents(today);
         Calendar c = Calendar.getInstance();
         c.setTime(new Date()); // as key to get the right list
         //this.list = EventSingleton.getList();
@@ -121,9 +118,15 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         if(this.list!=null) {
             for (Event e : this.list) {
                 if(e.getPos()==null){
-                    e.setPos(checkLatLng(e.getPlace()));
+                    LatLng l = checkLatLng(e.getPlace());
+                    if(l != null){
+                        e.setPos(l);
+                        mMap.addMarker(new MarkerOptions().position(e.getPos()).title(e.getTitle()).icon(getMarkerIcon("#000000"))).setSnippet(e.getPlace() + ", " + e.getDate());
+                    }
                 }
-                mMap.addMarker(new MarkerOptions().position(e.getPos()).title(e.getTitle()).icon(getMarkerIcon("#000000"))).setSnippet(e.getPlace() + ", " + e.getDate());
+                else {
+                    mMap.addMarker(new MarkerOptions().position(e.getPos()).title(e.getTitle()).icon(getMarkerIcon("#000000"))).setSnippet(e.getPlace() + ", " + e.getDate());
+                }
             }
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
@@ -131,7 +134,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
 
     //searching for Lat and Lng of the event
     private LatLng checkLatLng(String place) {
-        LatLng l = Localisation.getPosition();
+        LatLng l = null;
         if(Geocoder.isPresent()){
             try {
                 String location = place + " Dresden";

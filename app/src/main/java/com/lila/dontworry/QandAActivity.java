@@ -18,7 +18,7 @@ import com.lila.dontworry.Logic.Question;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import java.util.ArrayList;
 
-public class QandAActivity extends AppCompatActivity { //TODO:FROM DATABASE
+public class QandAActivity extends AppCompatActivity {
     private int n; //number of hints
     DatabaseHandler databaseHandler;
     private int count = 0;

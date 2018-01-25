@@ -11,21 +11,23 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-
 import com.lila.dontworry.Logic.DatabaseHandler;
-import com.lila.dontworry.Logic.EventAsync;
 import com.lila.dontworry.Logic.Mood;
-import com.lila.dontworry.Logic.MoodSingleton;
-import com.lila.dontworry.Logic.Question;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MoodReviewActivity extends AppCompatActivity {
     final Context context = this;
-    private MoodSingleton moodSingleton;
     static Mood tempMood = Mood.VERY_BAD;
+    String date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        this.date = cal.getTime().toString();
         setContentView(R.layout.activity_moodreview);
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -34,8 +36,6 @@ public class MoodReviewActivity extends AppCompatActivity {
         navigation.setSelectedItemId(R.id.statistics);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         addListenerOnButton();
-
-        this.moodSingleton = MoodSingleton.getInstance();//TODO:FROM DATABASE
     }
 
     // mood review
@@ -47,7 +47,7 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                databaseHandler.addMood(Mood.BAD, EventAsync.getDate(0));
+                databaseHandler.addMood(Mood.BAD, date);
                 //moodSingleton.put(Mood.BAD);
                 startActivity(intent);
             }
@@ -56,7 +56,7 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                databaseHandler.addMood(Mood.GOOD, EventAsync.getDate(0));
+                databaseHandler.addMood(Mood.GOOD, date);
                 //moodSingleton.put(Mood.GOOD);
                 startActivity(intent);
             }
@@ -65,7 +65,7 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                databaseHandler.addMood(Mood.MODERATE, EventAsync.getDate(0));
+                databaseHandler.addMood(Mood.MODERATE, date);
 //                moodSingleton.put(Mood.MODERATE);
                 startActivity(intent);
             }
@@ -74,7 +74,7 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodvg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                databaseHandler.addMood(Mood.GOOD, EventAsync.getDate(0));
+                databaseHandler.addMood(Mood.GOOD, date);
 //                moodSingleton.put(Mood.VERY_GOOD);
                 startActivity(intent);
             }
@@ -83,7 +83,7 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodvb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                databaseHandler.addMood(Mood.VERY_BAD, EventAsync.getDate(0));
+                databaseHandler.addMood(Mood.VERY_BAD, date);
 //                moodSingleton.put(Mood.VERY_BAD);
                 startActivity(intent);
             }

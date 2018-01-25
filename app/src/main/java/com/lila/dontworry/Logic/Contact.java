@@ -13,7 +13,6 @@ public class Contact {
         this.name = name;
         this.number = number;
         this.photo = photo;
-        System.out.println("New Contact:" + name + number);
     }
 
     public String getName() {

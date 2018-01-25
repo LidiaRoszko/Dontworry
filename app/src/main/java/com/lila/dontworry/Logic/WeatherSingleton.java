@@ -6,7 +6,7 @@ import java.util.Date;
  * Created by Lidia on 05.12.2017.
  */
 
-public class WeatherSingleton { //Singleton to save the weather TODO: to DB
+public class WeatherSingleton {
 
     private static WeatherSingleton instance = null;
 

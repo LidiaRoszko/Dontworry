@@ -35,10 +35,8 @@ public class EventAsync extends AsyncTask<URL, Integer, Long> {
             return null;
         }
 
-
-
         int cachedDays = 3;
-        for (int i = 0; i < cachedDays; i++) { // TODO: for 3 days
+        for (int i = 0; i < cachedDays; i++) {
 
             System.out.println("FETCH EVENTS " + getDate(i));
             this.list = new ArrayList();
@@ -87,7 +85,7 @@ public class EventAsync extends AsyncTask<URL, Integer, Long> {
 
                     }
                     if (this.list.size() > 0) {
-                        //EventSingleton.getInstance(this.list, (Calendar) days.get(i));
+                        System.out.println("events are there! for " + getDate(i));
                         DatabaseHandler.addEventList(this.list, getDate(i));
                     }
                 }
