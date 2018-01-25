@@ -6,11 +6,13 @@ import com.google.android.gms.maps.model.LatLng;
  * Created by Lidia on 05.12.2017.
  */
 
-public class Localisation { //TODO: to DB
+public class Localisation {
     //dresden 51.06814779850998 13.763458840548992
     private static LatLng position = new LatLng(51.06814779850998,13.763458840548992);
 
     private static double l1 = 51.06814779850998;
+
+    private static boolean change = true;
 
     public static double getL1() {
         return l1;
@@ -29,6 +31,7 @@ public class Localisation { //TODO: to DB
             }
             position = l;
             setLocalisation(l);
+            change = true;
             return Localisation.instance;
         }
         public static void setLocalisation(LatLng l){
@@ -36,7 +39,15 @@ public class Localisation { //TODO: to DB
             l2 = l.longitude;
         }
 
-        public static LatLng getPosition(){
+    public static boolean isChange() {
+        return change;
+    }
+
+    public static void setChange(boolean change) {
+        Localisation.change = change;
+    }
+
+    public static LatLng getPosition(){
             return position;
         }
     }

@@ -21,7 +21,6 @@ public class Event {
         this.title = title;
         this.link = link;
         this.pos = null;
-        System.out.println("New event with the title " + title + " in " + place + " at " + date);
     }
 
     public String getDate() {

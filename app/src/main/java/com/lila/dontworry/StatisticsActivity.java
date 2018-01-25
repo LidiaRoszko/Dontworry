@@ -13,19 +13,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.lila.dontworry.Logic.DatabaseHandler;
-import com.lila.dontworry.Logic.EventAsync;
 import com.lila.dontworry.Logic.Mood;
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABASE
+public class StatisticsActivity extends AppCompatActivity {
 
     private final Context context = this;
     private ArrayList<String> dates;
@@ -41,21 +38,12 @@ public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABAS
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         DatabaseHandler databaseHandler = DatabaseHandler.getInstance(this);
-        //databaseHandler.addMood(MoodReviewActivity.tempMood, EventAsync.getDate(0));
 
         //if landscape then graph
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-           /*
-            moods = new ArrayList<>();
-            moods = getMoods(true);
 
-            dates = new ArrayList<>();
-            dates = getDates(true);
-*/
            moods = databaseHandler.getMoodList();
            dates = databaseHandler.getMoodDateList();
-
-
 
             int n = dates.size();
 
@@ -65,6 +53,10 @@ public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABAS
             ArrayList<DataPoint> datapointsM = new ArrayList<>();
             ArrayList<DataPoint> datapointsB = new ArrayList<>();
             ArrayList<DataPoint> datapointsVB = new ArrayList<>();
+
+            if(n>10){
+                n = 10;
+            }
 
             for(int i = 0 ; i< n ; i++){
               datapoints.add(new DataPoint(i, moods.get(i).ordinal()));
@@ -152,13 +144,6 @@ public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABAS
             TextView moodDay3 = findViewById(R.id.moodDay3);
             TextView moodDay4 = findViewById(R.id.moodDay4);
 
-            /*
-            moods = new ArrayList<>();
-            moods = getMoods(false);
-
-            dates = new ArrayList<>();
-            dates = getDates(false);
-*/
             moods = databaseHandler.getMoodList();
             dates = databaseHandler.getMoodDateList();
 
@@ -187,9 +172,7 @@ public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABAS
 
     }
 
-    private ArrayList<String> getDates(Boolean ifAll) { //TODO: from DB
-        //  DatabaseHandler databaseHandler;
-        // databaseHandler.getMoodTable().getDatesAsString();
+    private ArrayList<String> getDates(Boolean ifAll) {
         ArrayList<String> m = new ArrayList<>();
         ArrayList<String> m2 = new ArrayList<>();
         m.add("10.10.2002");m.add("11.10.2002");m.add("12.10.2002");m.add("13.10.2002");m.add("14.10.2002");
@@ -209,9 +192,7 @@ public class StatisticsActivity extends AppCompatActivity {  //TODO:FROM DATABAS
         return m2;
     }
 
-    private ArrayList<Mood> getMoods(Boolean ifAll) { //TODO: from DB
-        //  DatabaseHandler databaseHandler;
-        // databaseHandler.getMoodTable().getMoods();
+    private ArrayList<Mood> getMoods(Boolean ifAll) {
         ArrayList<Mood> m = new ArrayList<>();
         ArrayList<Mood> m2 = new ArrayList<>();
         m.add(Mood.BAD);m.add(Mood.BAD);m.add(Mood.VERY_BAD);m.add(Mood.VERY_BAD);m.add(Mood.VERY_GOOD);
