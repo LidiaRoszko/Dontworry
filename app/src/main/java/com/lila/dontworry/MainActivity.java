@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -20,16 +21,16 @@ import com.lila.dontworry.Logic.WeatherAsync;
 import com.lila.dontworry.Logic.WeatherSingleton;
 import org.json.JSONException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
+    final Handler handler = new Handler();
+    final Timer timer = new Timer();
     final Context context = this;
-    public static int connectionType = Utility.TYPE_DISCONNECTED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,49 +44,66 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         addListenerOnButton();
 
-        try {
-            getWeather();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(!(Utility.getConnectionType(this) == Utility.TYPE_DISCONNECTED)){
+            try {
+                if (!WeatherSingleton.exist()) {
+                    getWeather();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+/*
+            try {
+                getEvents();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+*/
         }
-
-        try {
-            getEvents();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     private void getEvents() throws IOException {
-        if (Utility.getConnectionType(this) == Utility.TYPE_DISCONNECTED)
-            return;
-
-        connectionType = Utility.getConnectionType(this);
-
-        new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/"));
-
-    }
-
-    private void getWeather() throws IOException, JSONException { // www.androstock.com - getting the weather
-
-        if (Utility.getConnectionType(this) == Utility.TYPE_DISCONNECTED)
-            return;
-        if (!WeatherSingleton.exist() || Localisation.isChange()) {
-            Localisation.setChange(false);
-            String OPEN_WEATHER_MAP_URL = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric";
-            String lat = String.valueOf(Localisation.getL1());
-            String lon = String.valueOf(Localisation.getL2());
-            URL url = new URL(String.format(OPEN_WEATHER_MAP_URL, lat, lon));
-            new WeatherAsync().execute(url);
+        TimerTask doAsynchronousTask = new TimerTask() {
+        @Override
+        public void run() {
+            handler.post(new Runnable() {
+                public void run() {
+                    try {
+                        new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/")); //TODO: CHECK on EventAsynchr
+                    } catch (Exception e) {
+                    }
+                }
+            });
         }
+    };
+    timer.schedule(doAsynchronousTask, 0, 90000); //execute in every 1000000 ms 16 min
+}
+
+    private void getWeather() throws IOException, JSONException {
+        TimerTask doAsynchronousTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            String OPEN_WEATHER_MAP_URL = "http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric";
+                            String lat = String.valueOf(Localisation.getL1());
+                            String lon = String.valueOf(Localisation.getL2());
+                            URL url = new URL(String.format(OPEN_WEATHER_MAP_URL, lat, lon));
+                            new WeatherAsync().execute(url);
+                        } catch (Exception e) {
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(doAsynchronousTask, 0, 120000); //execute in every 1000000 ms 16 min
     }
 
     public void addListenerOnButton() {
         //new activity should start after click on the bulb
-        final Context context = this;
         ImageButton imageButton = (ImageButton) findViewById(R.id.bulb);
         imageButton.setOnClickListener(new View.OnClickListener() {
 
@@ -96,36 +114,18 @@ public class MainActivity extends AppCompatActivity {
                 if (number == 4 && Utility.getConnectionType(context) != ConnectivityManager.TYPE_WIFI)
                     number = 3;
                 if (number == 1) {
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(new Date());
-                    cal.add(Calendar.HOUR_OF_DAY, -3); // minus 3 hours
                     if (WeatherSingleton.exist()) {
-
-                        if(Localisation.isChange() || WeatherSingleton.getWeather().getDate().before(cal.getTime())){
-                            try {
-                                number = 5;
-                                getWeather();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        else {
                             Intent i1 = new Intent(context, WeatherActivity.class);
                             startActivity(i1);
-                        }
                     }
                     else{
                         number = 5;
                     }
                 }
-                //else if(number==2 && EventSingleton.getMap()!=null){
                 else if (number == 2 && DatabaseHandler.eventsFetched) {
                     Intent intent2 = new Intent(context, EventActivity.class);
                     startActivity(intent2);
                 }
-                //else if(number==2 && EventSingleton.getMap()==null){
                 else if (number == 2 && !DatabaseHandler.eventsFetched) {
                     Intent intent2 = new Intent(context, HintActivity.class);
                     startActivity(intent2);
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent2 = new Intent(context, HintActivity.class);
                     startActivity(intent2);
                 } else if (number == 4) {
-                    Intent intent2 = new Intent(context, YoutubePlayer.class);
+                    Intent intent2 = new Intent(context, PhoneActivity.class);
                     startActivity(intent2);
                 } else {
                     Intent intent3 = new Intent(context, PhoneActivity.class);
@@ -177,10 +177,7 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.statistics:
                     Intent i1;
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(new Date());
-                    cal.add(Calendar.DAY_OF_MONTH, -1);
-                    if (true) { //TODO: databaseHandler.getMoodDateList().contains(cal.getTime().toString())
+                    if (DatabaseHandler.getInstance(context).getMoodDateList().contains(MoodReviewActivity.getPreviousDate())) {
                         i1 = new Intent(context, StatisticsActivity.class);
                     } else {
                         i1 = new Intent(context, MoodReviewActivity.class);

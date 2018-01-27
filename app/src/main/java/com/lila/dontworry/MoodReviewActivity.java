@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Mood;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -24,10 +26,7 @@ public class MoodReviewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.DAY_OF_MONTH, -1);
-        this.date = cal.getTime().toString();
+        this.date = getPreviousDate();
         setContentView(R.layout.activity_moodreview);
         android.support.v7.widget.Toolbar myToolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -74,7 +73,7 @@ public class MoodReviewActivity extends AppCompatActivity {
         moodvg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                databaseHandler.addMood(Mood.GOOD, date);
+                databaseHandler.addMood(Mood.VERY_GOOD, date);
 //                moodSingleton.put(Mood.VERY_GOOD);
                 startActivity(intent);
             }
@@ -135,4 +134,24 @@ public class MoodReviewActivity extends AppCompatActivity {
             return false;
         }
     };
+
+    public static String getPreviousDate() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        return getStringFromDate(cal);
+    }
+    private static String getStringFromDate(Calendar cal){
+        int month = cal.get(Calendar.MONTH) + 1;
+        String monthString = String.valueOf(month);
+        if (month < 10) {
+            monthString = "0" + monthString;
+        }
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        String dayString = String.valueOf(day);
+        if (day < 10) {
+            dayString = "0" + dayString;
+        }
+        return dayString + "." + monthString + "." + cal.get(Calendar.YEAR);
+    }
 }

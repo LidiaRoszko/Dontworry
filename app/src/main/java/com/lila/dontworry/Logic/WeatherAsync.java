@@ -5,11 +5,13 @@ import android.os.AsyncTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -21,41 +23,52 @@ public class WeatherAsync extends AsyncTask<URL, Integer, JSONObject> {
 
     @Override
     protected JSONObject doInBackground(URL... urls) {
-        HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) urls[0].openConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.HOUR_OF_DAY, -3); // minus 3 hours
+        Boolean b = true;
+        if(WeatherSingleton.exist()){
+            b = WeatherSingleton.getWeather().getDate().before(cal.getTime());
         }
+        System.out.println("WeatherAsync: changed? - " + Localisation.isChange() + ", before? - " + b);
+        if(Localisation.isChange() || WeatherSingleton.getWeather().getDate().before(cal.getTime())){
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) urls[0].openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Localisation.setChange(false);
 
         connection.addRequestProperty("x-api-key", "3cb");
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            StringBuffer json = new StringBuffer(1024);
+            String tmp = "";
+            try {
+                while ((tmp = reader.readLine()) != null)
+                    json.append(tmp).append("\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        StringBuffer json = new StringBuffer(1024);
-        String tmp = "";
-        try {
-            while ((tmp = reader.readLine()) != null)
-                json.append(tmp).append("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            JSONObject data = new JSONObject(json.toString());
-            onPostExecute(data);
-        } catch (JSONException e) {
-            e.printStackTrace();
+            try {
+                JSONObject data = new JSONObject(json.toString());
+                return data;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
         return null;
     }
@@ -82,6 +95,7 @@ public class WeatherAsync extends AsyncTask<URL, Integer, JSONObject> {
         return false;
     }
 
+    @Override
     protected void onPostExecute(JSONObject json) {
         try {
             if(json != null){

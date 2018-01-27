@@ -27,7 +27,7 @@ public class StatisticsActivity extends AppCompatActivity {
     private final Context context = this;
     private ArrayList<String> dates;
     private ArrayList<Mood> moods;
-
+    private DatabaseHandler databaseHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,15 +37,23 @@ public class StatisticsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        DatabaseHandler databaseHandler = DatabaseHandler.getInstance(this);
-
+        databaseHandler = DatabaseHandler.getInstance(this);
+        moods = databaseHandler.getMoodList();
+        dates = databaseHandler.getMoodDateList();
+        dates.add("20.42.4444");
+        moods.add(Mood.VERY_GOOD);
+        dates.add("21.42.4444");
+        moods.add(Mood.GOOD);
+        dates.add("22.42.4444");
+        moods.add(Mood.VERY_GOOD);
+        dates.add("24.42.4444");
+        moods.add(Mood.VERY_BAD);
+        dates.add("25.42.4444");
+        moods.add(Mood.BAD);
         //if landscape then graph
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 
-           moods = databaseHandler.getMoodList();
-           dates = databaseHandler.getMoodDateList();
-
-            int n = dates.size();
+            final int n = dates.size();
 
             ArrayList<DataPoint> datapoints = new ArrayList<>();
             ArrayList<DataPoint> datapointsVG = new ArrayList<>();
@@ -54,36 +62,35 @@ public class StatisticsActivity extends AppCompatActivity {
             ArrayList<DataPoint> datapointsB = new ArrayList<>();
             ArrayList<DataPoint> datapointsVB = new ArrayList<>();
 
-            if(n>10){
-                n = 10;
+            for(int i = 0 ; i < n ; i++){
+                datapoints.add(new DataPoint(i, moods.get(i).ordinal()));
             }
 
-            for(int i = 0 ; i< n ; i++){
-              datapoints.add(new DataPoint(i, moods.get(i).ordinal()));
-              datapointsVG.add(new DataPoint(i, 4));
-              datapointsG.add(new DataPoint(i, 3));
-              datapointsM.add(new DataPoint(i, 2));
-              datapointsB.add(new DataPoint(i, 1));
-              datapointsVB.add(new DataPoint(i, 0));
+            for(int j = 0; j < 10; j++){
+                datapointsVG.add(new DataPoint(j, 4));
+                datapointsG.add(new DataPoint(j, 3));
+                datapointsM.add(new DataPoint(j, 2));
+                datapointsB.add(new DataPoint(j, 1));
+                datapointsVB.add(new DataPoint(j, 0));
             }
-
             GraphView graph = (GraphView) findViewById(R.id.graph);
-            NumberFormat nf = NumberFormat.getInstance();
-            graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(nf, nf));
-
-            // custom label formatter to show currency "EUR"
+            graph.getViewport().setMinX(0);
+            graph.getViewport().setMaxX(15);
             graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
                 @Override
                 public String formatLabel(double value, boolean isValueX) {
                     if (isValueX) {
-                        int number =  (int) value;
-                        return dates.get(number).substring(0,6);
-
+                        int num = (int)value;
+                        if(num<n){
+                        return dates.get(num).substring(0,5);
+                        }
+                        else{
+                            return "";
+                        }
                     } else {
                         return getMoodName(value);
                     }
                 }
-
                 private String getMoodName(double value) {
                     int number = (int) value;
                     switch(number) {
@@ -101,7 +108,6 @@ public class StatisticsActivity extends AppCompatActivity {
                     }
                 }
             });
-
             LineGraphSeries<DataPoint> series = new LineGraphSeries<>(datapoints.toArray( new DataPoint[]{}));
             series.setDrawDataPoints(true);
             series.setColor(Color.DKGRAY);
@@ -134,82 +140,47 @@ public class StatisticsActivity extends AppCompatActivity {
             graph.addSeries(series);
         }
         else {
-            ImageView mood1 = findViewById(R.id.mood1);
-            ImageView mood2 = findViewById(R.id.mood2);
-            ImageView mood3 = findViewById(R.id.mood3);
-            ImageView mood4 = findViewById(R.id.mood4);
-
-            TextView moodDay1 = findViewById(R.id.moodDay1);
-            TextView moodDay2 = findViewById(R.id.moodDay2);
-            TextView moodDay3 = findViewById(R.id.moodDay3);
-            TextView moodDay4 = findViewById(R.id.moodDay4);
-
-            moods = databaseHandler.getMoodList();
-            dates = databaseHandler.getMoodDateList();
-
-
-            switch (dates.size()) {
+            int n = dates.size();
+            ArrayList<String> dates2 = new ArrayList<>();
+            ArrayList<Mood> moods2 = new ArrayList<>();
+            if(n>4){
+              int i = n-1;
+              while(i>0&&moods2.size()<4){
+                  moods2.add(moods.get(i));
+                  dates2.add(dates.get(i));
+                  i--;
+              }
+            }
+            else {
+                dates2 = dates;
+                moods2 = moods;
+            }
+            switch (dates2.size()) {
                 case 4:
-                    mood4.setImageResource(getResource(moods.get(3)));
-                    moodDay4.setText(dates.get(3));
+                    ImageView mood4 = findViewById(R.id.mood4);
+                    TextView moodDay4 = findViewById(R.id.moodDay4);
+                    mood4.setImageResource(getResource(moods2.get(3)));
+                    moodDay4.setText(dates2.get(3));
                 case 3:
-                    mood3.setImageResource(getResource(moods.get(2)));
-                    moodDay3.setText(dates.get(2));
+                    ImageView mood3 = findViewById(R.id.mood3);
+                    TextView moodDay3 = findViewById(R.id.moodDay3);
+                    mood3.setImageResource(getResource(moods2.get(2)));
+                    moodDay3.setText(dates2.get(2));
                 case 2:
-                    mood2.setImageResource(getResource(moods.get(1)));
-                    moodDay2.setText(dates.get(1));
+                    ImageView mood2 = findViewById(R.id.mood2);
+                    TextView moodDay2 = findViewById(R.id.moodDay2);
+                    mood2.setImageResource(getResource(moods2.get(1)));
+                    moodDay2.setText(dates2.get(1));
                 case 1:
-                    mood1.setImageResource(getResource(moods.get(0)));
-                    moodDay1.setText(dates.get(0));
+                    ImageView mood1 = findViewById(R.id.mood1);
+                    TextView moodDay1 = findViewById(R.id.moodDay1);
+                    mood1.setImageResource(getResource(moods2.get(0)));
+                    moodDay1.setText(dates2.get(0));
                     break;
                 default:
                     break;
             }
         }
-
-        System.out.println(moods);
-        System.out.println(dates);
-
-    }
-
-    private ArrayList<String> getDates(Boolean ifAll) {
-        ArrayList<String> m = new ArrayList<>();
-        ArrayList<String> m2 = new ArrayList<>();
-        m.add("10.10.2002");m.add("11.10.2002");m.add("12.10.2002");m.add("13.10.2002");m.add("14.10.2002");
-        if(ifAll){
-            return m;
-        }
-        int n = m.size();
-        if(n <= 4){
-            return m;
-        }
-        else {
-            m2.add(m.get(n-1));
-            m2.add(m.get(n-2));
-            m2.add(m.get(n-3));
-            m2.add(m.get(n-4));
-        }
-        return m2;
-    }
-
-    private ArrayList<Mood> getMoods(Boolean ifAll) {
-        ArrayList<Mood> m = new ArrayList<>();
-        ArrayList<Mood> m2 = new ArrayList<>();
-        m.add(Mood.BAD);m.add(Mood.BAD);m.add(Mood.VERY_BAD);m.add(Mood.VERY_BAD);m.add(Mood.VERY_GOOD);
-        if(ifAll){
-            return m;
-        }
-        int n = m.size();
-        if(n <= 4){
-            return m;
-        }
-        else {
-            m2.add(m.get(n-1));
-            m2.add(m.get(n-2));
-            m2.add(m.get(n-3));
-            m2.add(m.get(n-4));
-        }
-        return m2;
     }
 
     private int getResource(Mood mood) {
@@ -246,9 +217,6 @@ public class StatisticsActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.statistics:
-                    Intent i1 = new Intent(context, MoodReviewActivity.class);
-                    i1.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    startActivity(i1);
                     return true;
                 case R.id.hints:
                     Intent i2 = new Intent(context, MainActivity.class);
@@ -256,7 +224,9 @@ public class StatisticsActivity extends AppCompatActivity {
                     startActivity(i2);
                     return true;
                 case R.id.questions:
-                    return true;
+                    Intent i1 = new Intent(context, QandAActivity.class);
+                    i1.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(i1);
             }
             return false;
         }
