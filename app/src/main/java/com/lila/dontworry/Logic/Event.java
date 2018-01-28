@@ -61,6 +61,6 @@ public class Event {
 
     public void setPos(LatLng pos) {
         this.pos = pos;
-        System.out.println("Event " + this.title + " has a position " + pos.latitude + ", " + pos.longitude);
+        //System.out.println("Event " + this.title + " has a position " + pos.latitude + ", " + pos.longitude);
     }
 }

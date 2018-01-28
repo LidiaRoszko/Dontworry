@@ -228,7 +228,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         values.put(KEY_LINK, event.getLink());
         values.put(KEY_DATE_FETCH, dateFetched);
 
-        System.out.println(event.getDate() + " " + event.getPlace() + " " + event.getTitle() + " " + event.getLink());
+        //System.out.println(event.getDate() + " " + event.getPlace() + " " + event.getTitle() + " " + event.getLink());
 
         // Inserting Row
         db.insert(TABLE_EVENTS, null, values);
@@ -242,13 +242,17 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
     }
 
     private void _addEventList() {
-        removeOldEvents();
-        for (String fetchDate : tempEvents.keySet()) {
-            for (Event event : tempEvents.get(fetchDate)) {
+       //removeOldEvents();
+       for (String fetchDate : tempEvents.keySet()) {
+           System.out.println("Key: " + tempEvents.keySet().size() +
+                   ", Values" + tempEvents.get(fetchDate).size());
+           for (Event event : tempEvents.get(fetchDate)) {
                 addEvent(event, fetchDate);
             }
-        }
-        tempEvents.clear();
+       }
+       //tempEvents.clear();
+        tempEvents = new HashMap<>();
+
     }
 
     public ArrayList<Event> getEventList(String fetchDate) {
@@ -261,6 +265,9 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
         Cursor cursor = db.query(TABLE_EVENTS, null, KEY_DATE_FETCH + " = ?",
                 new String[] { String.valueOf(fetchDate) }, null, null, null, null);
 
+        System.out.println("+++ iterate all events -" + cursor.getCount() + "-");
+
+
         if (cursor != null) {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
@@ -272,6 +279,7 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
                     String link = cursor.getString(4);
                     eventArrayList.add(new Event(date, place, title, link));
                     cursor.moveToNext();
+                    //System.out.println("Event " + title);
                 }
                 cursor.close();
             }
@@ -292,9 +300,11 @@ public class DatabaseHandler extends SQLiteOpenHelper implements Serializable {
  */
         SQLiteDatabase db = this.getReadableDatabase();
 
-        db.delete(TABLE_EVENTS, KEY_DATE_FETCH + " != " + EventAsync.getDate(0) + " AND " +
+        String whereClause = KEY_DATE_FETCH + " != " + EventAsync.getDate(0) + " AND " +
                 KEY_DATE_FETCH + " != " + EventAsync.getDate(1) + " AND " +
-                KEY_DATE_FETCH + " != " + EventAsync.getDate(2), null);
+                KEY_DATE_FETCH + " != " + EventAsync.getDate(2);
+        System.out.println(whereClause);
+        db.delete(TABLE_EVENTS, whereClause, null);
 
         db.close();
 

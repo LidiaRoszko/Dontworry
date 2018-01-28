@@ -21,7 +21,10 @@ import com.lila.dontworry.Logic.WeatherAsync;
 import com.lila.dontworry.Logic.WeatherSingleton;
 import org.json.JSONException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     final Handler handler = new Handler();
     final Timer timer = new Timer();
     final Context context = this;
+    public static int connectionType = Utility.TYPE_DISCONNECTED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +58,13 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-/*
+
             try {
                 getEvents();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-*/
+
         }
     }
 
@@ -71,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
             handler.post(new Runnable() {
                 public void run() {
                     try {
+                        connectionType = Utility.getConnectionType(context);
                         new EventAsync().execute(new URL("https://www.kulturkalender-dresden.de/alle-veranstaltungen/")); //TODO: CHECK on EventAsynchr
                     } catch (Exception e) {
                     }
@@ -78,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     };
-    timer.schedule(doAsynchronousTask, 0, 90000); //execute in every 1000000 ms 16 min
+    timer.schedule(doAsynchronousTask, 0, 900000); //execute in every 1000000 ms 16 min
 }
 
     private void getWeather() throws IOException, JSONException {
@@ -133,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent2 = new Intent(context, HintActivity.class);
                     startActivity(intent2);
                 } else if (number == 4) {
-                    Intent intent2 = new Intent(context, PhoneActivity.class);
+                    Intent intent2 = new Intent(context, YoutubePlayer.class);
                     startActivity(intent2);
                 } else {
                     Intent intent3 = new Intent(context, PhoneActivity.class);

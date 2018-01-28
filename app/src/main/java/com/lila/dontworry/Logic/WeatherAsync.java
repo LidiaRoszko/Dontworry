@@ -40,7 +40,7 @@ public class WeatherAsync extends AsyncTask<URL, Integer, JSONObject> {
             }
             Localisation.setChange(false);
 
-        connection.addRequestProperty("x-api-key", "3cb");
+        connection.addRequestProperty("x-api-key", "");
             BufferedReader reader = null;
             try {
                 reader = new BufferedReader(

@@ -1,6 +1,10 @@
 package com.lila.dontworry.Logic;
 
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+
+import com.lila.dontworry.MainActivity;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -35,10 +39,16 @@ public class EventAsync extends AsyncTask<URL, Integer, Long> {
             return null;
         }
 
-        int cachedDays = 3;
-        for (int i = 0; i < cachedDays; i++) {
+        int cachedDays = 0;
+        if (MainActivity.connectionType == ConnectivityManager.TYPE_MOBILE)
+            cachedDays = 1;
+        if (MainActivity.connectionType == ConnectivityManager.TYPE_WIFI)
+            cachedDays = 3;
+        System.out.println("Fetch events for days: " + cachedDays);
 
-            System.out.println("FETCH EVENTS " + getDate(i));
+        for (int i = 0; i < cachedDays; i++) {
+            System.out.println("Fetch date " + getDate(i));
+
             this.list = new ArrayList();
 
             URL url = null;

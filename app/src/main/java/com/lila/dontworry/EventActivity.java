@@ -28,6 +28,8 @@ import com.lila.dontworry.Logic.DatabaseHandler;
 import com.lila.dontworry.Logic.Event;
 import com.lila.dontworry.Logic.EventAsync;
 import com.lila.dontworry.Logic.Localisation;
+import com.lila.dontworry.Logic.Utility;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,8 +52,12 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        /*
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo Wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        */
+
+        int connectionType = Utility.getConnectionType(this);
 
         Calendar c = Calendar.getInstance();
         c.setTime(new Date()); // as key to get the right list
@@ -60,13 +66,13 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         this.list = DatabaseHandler.getInstance(this).getEventList(EventAsync.getDate(0));
 
         // if landscape orientation and wifi then launching a fragment with a map
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && Wifi.isConnected()){
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && connectionType == ConnectivityManager.TYPE_WIFI){
             SupportMapFragment supportMapFragment;
             supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentMap);
             supportMapFragment.onAttach(this);
             supportMapFragment.getMapAsync(context);
         }// if landscape orientation and no wifi then no map
-        else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !Wifi.isConnected()){
+        else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && connectionType != ConnectivityManager.TYPE_WIFI){
             SupportMapFragment supportMapFragment;
             supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentMap);
             supportMapFragment.onDestroy();
